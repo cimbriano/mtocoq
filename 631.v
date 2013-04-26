@@ -3,44 +3,47 @@ Require Export Sflib.
 
 Require Export FSets.
 
-(* Language Syntax *)
 Inductive variable : Type := 
-  | var : id -> variable.
+|var : id -> variable.
 
 Inductive orambank : Type :=
-  | bank : nat -> orambank.
+|bank : nat -> orambank.
+
 
 Inductive expression : Type :=
-  | expr : variable -> expression
-  | exop : expression -> expression -> expression
-  | exarr: variable -> expression -> expression
-  | exnum: nat -> expression.
+|expr : variable -> expression
+|exop : expression -> expression -> expression
+|exarr: variable -> expression -> expression
+|exnum: nat -> expression.
 
 Inductive location : Type :=
-  | addr : nat -> location
-  | oram : orambank -> location.
+|addr : nat -> location
+|oram : orambank -> location.
 
 Inductive statement : Type :=
-  | skip : statement
-  | assign: variable -> expression -> statement
-  | arrasign: variable -> expression -> expression -> statement
-  | stif: expression -> program -> program -> statement
-  | stwhile: expression -> program -> statement  
- with program : Type := 
-  | line : location -> statement -> program
-  | progcat : program -> program -> program.
+|skip : statement
+|assign: variable -> expression -> statement
+|arrasign: variable -> expression -> expression -> statement
+|stif: expression -> program -> program -> statement
+|stwhile: expression -> program -> statement
 
-Inductive mtonat : Type := natl.
+with program : Type := 
+|line : location -> statement -> program
+|progcat : program -> program -> program.
 
-Inductive label :  Type := 
-  | low: label
-  | o_high : orambank -> label.
+Inductive mtonat : Type :=
+| natl.
 
-Inductive mtoarray : Type := arrl.
+Inductive label :  Type :=
+|low: label
+|o_high : orambank -> label.
+
+Inductive mtoarray : Type :=
+|arrl.
 
 Inductive labeledType : Type :=
-  | larr : mtoarray -> label -> labeledType
-  | lnat : mtonat -> label -> labeledType.
+|larr : mtoarray -> label -> labeledType
+|lnat : mtonat -> label -> labeledType.
 
 Definition mtojoin l1 l2 : label := 
 match l1 with
@@ -64,8 +67,8 @@ Definition environment := variable -> (option labeledType).
 Inductive TracePat : Type :=
 |Read : variable -> TracePat
 |Write: variable -> TracePat
-|Readarr:variable -> nat ->TracePat
-|Writearr:variable -> nat ->TracePat
+|Readarr:variable ->TracePat
+|Writearr:variable ->TracePat
 |Loop: location -> TracePat -> TracePat-> TracePat
 |Fetch: location -> TracePat
 |O:TracePat
@@ -86,6 +89,10 @@ Inductive tracePequiv: TracePat -> TracePat -> Prop:=
 (tracePequiv T11 T12) -> (tracePequiv T21 T22) -> 
 (tracePequiv (concat T11 T21) (concat T12 T22))
 .
+
+Inductive exprTyping: environment -> expression ->labeledType -> TracePat ->Prop :=
+|T-Var : 
+
 
 Definition memory := variable -> (option ).
 
