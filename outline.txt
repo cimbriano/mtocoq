@@ -16,6 +16,11 @@ Phase 2
 Current Open Questions 
 * How to represent Memory which is defined to be
 	Memory m element of Var -> (Array U Nat) x SecLabel
+	
+* How to represent memory as a Coq type?
 
+* Trace for loop - is Fetch (p) to fetch the instruction for the guard? What i the guard is a complicated expression?
 
-
+* Figure 5 - lattice order definition
+	- if l1 and l2 are labels, why the requirement that l2 not be a number
+	- As far as we understand and l (label) can't be a number at all. only L or and oram location
