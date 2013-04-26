@@ -71,14 +71,14 @@ Inductive TracePat : Type :=
 |Writearr:variable ->TracePat
 |Loop: location -> TracePat -> TracePat-> TracePat
 |Fetch: location -> TracePat
-|O:TracePat
+|Orambank : orambank -> TracePat
 |concat: TracePat -> TracePat -> TracePat
 |plus: TracePat -> TracePat -> TracePat
 |epsilon: TracePat.
 
 Inductive tracePequiv: TracePat -> TracePat -> Prop:=
 |epsilon_equiv: tracePequiv epsilon epsilon
-|O_equiv : tracePequiv O O
+|O_equiv : forall n, tracePequiv (Orambank n) (Orambank n)
 |read_equiv : forall x, tracePequiv (Read x) (Read x)
 |fetch_equiv: forall p, tracePequiv (Fetch p) (Fetch p)
 |assoc_equiv: forall t1 t2 t3, tracePequiv (concat (concat t1 t2) t3) (concat t1 (concat t2 t3))
@@ -91,7 +91,7 @@ Inductive tracePequiv: TracePat -> TracePat -> Prop:=
 .
 
 Inductive exprTyping: environment -> expression ->labeledType -> TracePat ->Prop :=
-|T-Var : 
+|T-Var : forall
 
 
 Definition memory := variable -> (option ).
