@@ -13,10 +13,16 @@ Phase 2
 10. Lemmas in tech report in order to prove theorem 1 on page 8:
 
 
+ToDo
+	- Write a boolean function version of tracePatternEquivalence
+	- How to represent arrays
+	- Write the auxiliary syntax in Figure 3 (get, update)
+
+
 Current Open Questions 
 * How to represent Memory which is defined to be
 	Memory m element of Var -> (Array U Nat) x SecLabel
-	
+
 * How to represent memory as a Coq type?
 
 * Trace for loop - is Fetch (p) to fetch the instruction for the guard? What i the guard is a complicated expression?

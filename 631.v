@@ -90,9 +90,30 @@ Inductive tracePequiv: TracePat -> TracePat -> Prop:=
 (tracePequiv (concat T11 T21) (concat T12 T22))
 .
 
-Inductive exprTyping: environment -> expression ->labeledType -> TracePat ->Prop :=
-|T-Var : forall
+Variable A : Type.
 
+(* We will want to change this definition later *)
+(* A list of nat doesn't have a length *)
+(*Definition array := list nat.*)
 
-Definition memory := variable -> (option ).
+Inductive array : nat -> Type :=
+  | arrnil : array 0
+  | arrcons : forall (n:nat), array n -> array (S n).
 
+Inductive value : Type :=
+ | ar : forall (n:nat), array n -> value
+ | nu : nat -> value.
+
+Definition memory := variable -> (option (value * label)).
+
+Inductive memoryLowEquiv : memory -> memory -> Prop :=
+  | def1: forall (x:variable) (v:value) (m1 m2:memory),
+    (((m1 x) = (Some (v , low))) <-> ((m2 x) = (Some (v , low)))) ->
+    memoryLowEquiv m1 m2.
+
+(*  *)
+Fixpoint get (len:nat) (m:array len) (n:nat) : nat :=
+  match m with
+  | arrnil => 0
+  | arrcons ele tail => if (ble_nat n (len - 1)) then (1) else 0
+  end.
