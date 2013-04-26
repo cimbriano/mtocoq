@@ -1,0 +1,21 @@
+Phase 1
+1. Language Syntax - Figure 2
+2. Auxiliary Syntax and Functions for Semantics - Figure 3
+3. Auxiliary Syntax and Function for Typing - Figure 5
+
+Phase 2
+4. Trace equivalence Definition - Figure 10 (Tech Report)
+5. Trace Pattern Equivalence - Figure 7
+6. Low Equivalence for Memory - Definition 1
+7. Gamma Validity - Definition 2
+8. Typing Rules - Figure 6
+9. Operational Semantics - Figure 4
+10. Lemmas in tech report in order to prove theorem 1 on page 8:
+
+
+Current Open Questions 
+* How to represent Memory which is defined to be
+	Memory m element of Var -> (Array U Nat) x SecLabel
+
+
+
