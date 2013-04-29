@@ -82,6 +82,23 @@ Inductive tracePequiv: TracePat -> TracePat -> Prop:=
 (tracePequiv (concat T11 T21) (concat T12 T22))
 .
 
+(** based on approach to recursion in coq described in
+ http://www.di.ens.fr/~zappa/teaching/coq/ecole10/summer/lectures/lec10.pdf **)
+Fixpoint TracePNormalFormHelp n T :  TracePat :=
+match n,T with 
+|(S n), (concat a epsilon) => TracePNormalForm n a
+|(S n), concat epsilon a => TracePNormalForm n a
+|(S n), concat a b => match TracePNormalForm  a with
+|concat c d => concat c (TracePNormalForm (concat d b))
+|c => c
+end
+| a => a
+end.
+
+
+Fixpoint boolTracePequiv : TracePat -> TracePat -> bool :=
+
+
 Definition evt l t:  TracePat :=
 match l with
 |low => t
