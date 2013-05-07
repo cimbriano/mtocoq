@@ -36,7 +36,7 @@ Inductive statement : Type :=
   | stwhile   : expression -> program -> statement
 
 with program : Type := 
-  | line    : location -> statement -> program
+  | labeledStmt : location -> statement -> program
   | progcat : program -> program -> program.
 
 

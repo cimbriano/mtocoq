@@ -120,12 +120,12 @@ Inductive statementTyping: environment -> label -> statement -> TracePat -> Prop
       (exprTyping gamma e (lnat l) T1) ->
       (progTyping gamma l0 S T2) ->
       (lable (mtojoin l l0) low) ->
-      (statementTyping gamma l0 (line p (stwhile e S )) (Loop p T1 T2))
+      (statementTyping gamma l0 (labeledStmt p (stwhile e S )) (Loop p T1 T2))
 
 with progTyping: environment -> label -> program -> TracePat -> Prop :=
   | TLab : forall gamma l0 s T p,  (statementTyping gamma l0 s T) -> (lable l0 p) ->
-      (progTyping gamma l0 (line p s) (concat (fetch p) T))
+      (progTyping gamma l0 (labeledStmt p s) (concat (fetch p) T))
   | TSeq : forall gamma l0 S1 T1 S2 T2, ((progTyping gamma l0 S1 T1) ->
       (progTyping gamma l0 S2 T2) ->
       (progTyping gamma l0 (progcat S1 S2) (concat T1 T2))).
-  
+

@@ -31,8 +31,8 @@ Inductive statement : Type :=
 |stif: expression -> program -> program -> statement
 |stwhile: expression -> program -> statement
 
-with program : Type := 
-|line : location -> statement -> program
+with program : Type :=
+|labeledStmt : location -> statement -> program
 |progcat : program -> program -> program.
 
 
