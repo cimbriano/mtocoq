@@ -30,3 +30,9 @@ Current Open Questions
 * Figure 5 - lattice order definition
 	- if l1 and l2 are labels, why the requirement that l2 not be a number
 	- As far as we understand and l (label) can't be a number at all. only L or and oram location
+
+
+Coq Questions
+
+* Can you branch on a proposition?  We're having trouble implementing the 'select' function.
+	- sumbool?
