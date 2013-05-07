@@ -17,11 +17,10 @@ Definition binop := mtoint -> mtoint -> mtoint.
 
 
 Inductive expression : Type :=
-
-|exvar : variable -> expression
-|exop : expression ->binop -> expression -> expression
-|exarr: variable -> expression -> expression
-|exnum: mtoint -> expression.
+  | exvar : variable -> expression
+  | exop : expression ->binop -> expression -> expression
+  | exarr: variable -> expression -> expression
+  | exnum: mtoint -> expression.
 
 
 Inductive location : Type :=
@@ -37,17 +36,17 @@ Inductive statement : Type :=
 
 with program : Type := 
   | labeledStmt : location -> statement -> program
-  | progcat : program -> program -> program.
+  | progcat     : program -> program -> program.
 
 
 Inductive label :  Type :=
-  |low    : label
-  |o_high : orambank -> label.
+  | low    : label
+  | o_high : orambank -> label.
 
 
 Inductive labeledType : Type :=
-  |larr : label -> labeledType
-  |lnat : label -> labeledType.
+  | larr : label -> labeledType
+  | lnat : label -> labeledType.
 
 Definition mtojoin l1 l2 : label := 
   match l1 with
