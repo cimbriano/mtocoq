@@ -89,9 +89,9 @@ Inductive exprTyping: environment -> expression ->labeledType -> TracePat ->Prop
 |TVar : forall (gamma:environment) (x:variable) l, 
 ((gamma x) =(Some (lnat l)))  -> (exprTyping gamma (exvar x) (lnat l) (evttracePat l (Read x)))
 |TCon : forall (gamma:environment) n, exprTyping gamma (exnum n) (lnat low) epsilon
-|TOp : forall (gamma:environment) e1 e2 l1 l2 T1 T2, 
+|TOp : forall (gamma:environment) e1 e2 l1 l2 T1 T2 op, 
 (exprTyping gamma e1 (lnat l1) T1) -> (exprTyping gamma e2 (lnat l2) T2) ->
-(exprTyping gamma (exop e1 e2) (lnat (mtojoin l1 l2)) (concat T1 T2))
+(exprTyping gamma (exop e1 op e2) (lnat (mtojoin l1 l2)) (concat T1 T2))
 |TArr : forall (gamma:environment) x e l l2 T, ((gamma x) =(Some (larr l))) -> 
 (exprTyping gamma e (lnat l2) T) -> (lable l2 l) ->
 (exprTyping gamma (exarr x e) (lnat (mtojoin l l2)) (concat T (evttracePat l (Readarr x)))).

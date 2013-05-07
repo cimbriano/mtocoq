@@ -11,12 +11,16 @@ Inductive variable : Type :=
 Inductive orambank : Type :=
 |bank : nat -> orambank.
 
+Definition mtoint : Type := nat.
+
+Definition binop := mtoint -> mtoint -> mtoint.
+
 
 Inductive expression : Type :=
 |exvar : variable -> expression
-|exop : expression -> expression -> expression
+|exop : expression ->binop -> expression -> expression
 |exarr: variable -> expression -> expression
-|exnum: nat -> expression.
+|exnum: mtoint -> expression.
 
 Inductive location : Type :=
 |addr : nat -> location
