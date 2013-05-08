@@ -101,30 +101,33 @@ Inductive select : TracePat -> TracePat -> TracePat -> Prop :=
   | equiv : forall t1 t2, (tracePequiv t1 t2) -> (select t1 t2 t1) 
   | inequiv : forall t1 t2, (~(tracePequiv t1 t2)) -> (select t1 t2 (TracePplus t1 t2))
 .
-Inductive statementTyping: environment -> label -> statement -> TracePat -> Prop :=
-  | TSkip : forall gamma l, statementTyping gamma l skip epsilon
-  | TAsn : forall gamma e l T x l0 l1, (exprTyping gamma e (lnat l) T) -> 
+Inductive statementTyping: environment -> label -> labeledstatement -> TracePat -> Prop :=
+  | TSkip : forall gamma p l, statementTyping gamma l (labline p skip) epsilon
+  | TAsn : forall gamma e l p T x l0 l1, (exprTyping gamma e (lnat l) T) -> 
       (gamma x = Some (lnat l1)) -> (lable (mtojoin l0 l) l1) ->
-      (statementTyping gamma l0 (assign x e) (concat T (evttracePat l1 (Write x))))
-  | TAAsn : forall gamma e1 e2 l1 l2 T1 T2 l0 l x,
+      (statementTyping gamma l0 (labline p (assign x e)) (concat T (evttracePat l1 (Write x))))
+  | TAAsn : forall gamma e1 e2 l1 l2 T1 T2 l0 l x p,
       (exprTyping gamma e1 (lnat l1) T1) -> (exprTyping gamma e2 (lnat l2) T2) ->
       ((gamma x) = Some (larr l)) -> (lable (mtojoin l1 (mtojoin l2 l0)) l) ->
-      (statementTyping gamma l0 (arrassign x e1 e2) (concat T1 (concat T2 (evttracePat l (Writearr x)))))
-  | TCond : forall gamma e l l0 T1 T2 T S1 S2 T3,
+      (statementTyping gamma l0 (labline p (arrassign x e1 e2)) (concat T1 (concat T2 (evttracePat l (Writearr x)))))
+  | TCond : forall gamma e l l0 T1 T2 T S1 S2 T3 p,
       (exprTyping gamma e (lnat l) T) ->
       (progTyping gamma (mtojoin l l0) S1 T1) ->
       (progTyping gamma (mtojoin l l0) S2 T2) ->
       (((mtojoin l l0) <> low) -> (tracePequiv T1 T2)) -> (select T1 T2 T3) ->
-      (statementTyping gamma l0 (stif e S1 S2) (concat T T3))
+      (statementTyping gamma l0 (labline p (stif e S1 S2)) (concat T T3))
   | TWhile : forall gamma e l l0 T1 T2 S p,
       (exprTyping gamma e (lnat l) T1) ->
       (progTyping gamma l0 S T2) ->
       (lable (mtojoin l l0) low) ->
-      (statementTyping gamma l0 (line p (stwhile e S )) (Loop p T1 T2))
+      (statementTyping gamma l0 (labline p (stwhile e S )) (Loop p T1 T2))
 
 with progTyping: environment -> label -> program -> TracePat -> Prop :=
-  | TLab : forall gamma l0 s T p,  (statementTyping gamma l0 s T) -> (lable l0 p) ->
-      (progTyping gamma l0 (line p s) (concat (fetch p) T))
+(*** for this rule, they require that l0 is less/equal p, this is not defined for 
+use in locations, only for labels ***)
+
+  | TLab : forall gamma l0 s T p,  (statementTyping gamma l0 (labline p s) T) -> (lablerhslocataion l0 p) ->
+      (progTyping gamma l0 (oneLineProg( labline p s)) (concat (Fetch p) T))
   | TSeq : forall gamma l0 S1 T1 S2 T2, ((progTyping gamma l0 S1 T1) ->
       (progTyping gamma l0 S2 T2) ->
       (progTyping gamma l0 (progcat S1 S2) (concat T1 T2))).

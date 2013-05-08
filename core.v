@@ -67,6 +67,10 @@ Inductive lable : label -> label -> Prop :=
 |fst_low : forall l, lable low l
 |snd_high: forall l n, lable l (o_high n).
 
+(**** we cover that case here****)
+Inductive lablerhslocataion : label -> location -> Prop :=
+|nothighloc : forall l n, lablerhslocataion l (oram n). 
+
 
 
 

@@ -102,6 +102,23 @@ progSem : memory -> program -> trace -> memory -> Prop :=
 (progSem M S1 t1 M1) -> (progSem M1 S2 t2 M2) ->
 (progSem M (progcat S1 S2) (concat t1 t2) M2).
 
+Definition lowEquivalentMem (M1 M2: memory):  Prop :=
+ (forall x v, (M1 x = Some (vint v low)) <-> (M2 x = Some (vint v low))) \/
+ (forall x v, (M1 x = Some (varr v low)) <-> (M2 x = Some (varr v low))).
+
+Inductive traceequiv: trace -> trace -> Prop:=
+  | equal_equiv: forall t, traceequiv t t
+  | refl_equiv: forall t1 t2, (traceequiv t1 t2) -> (traceequiv t2 t1)
+  | assoc_equiv: forall t1 t2 t3, traceequiv (concat (concat t1 t2) t3) (concat t1 (concat t2 t3))
+  | trans_equiv: forall t1 t2 t3, (traceequiv t1 t2) -> (traceequiv t2 t3) -> (traceequiv t1 t3)
+  | epsilon_ident_equivl: forall T, (traceequiv T T) -> traceequiv T (concat epsilon T)
+  | epsilon_ident_equivr: forall T, (traceequiv T T) -> traceequiv T (concat T epsilon)
+  | concat_decomp_equiv: forall T11 T21 T12 T22, 
+  (traceequiv T11 T12) -> (traceequiv T21 T22) -> 
+  (traceequiv (concat T11 T21) (concat T12 T22))
+  .
+
+(***
 Check (stmtSem (memdefine (fun x => None) (var (Id (S O))) (vint O low))
 
  (labline (addr O) (assign (var(Id(S O))) (S O)))
@@ -109,7 +126,7 @@ Check (stmtSem (memdefine (fun x => None) (var (Id (S O))) (vint O low))
 (concat epsilon (write (var (Id(S O))) (S O)))
 
 (memdefine (memdefine (fun x => None) (var (Id (S O))) (O)) (var (Id(S O))) (vint (S O) low))).
-
+***)
 
 
 
