@@ -13,4 +13,8 @@ Require Export typing.
 Require Export lemmas.
 
 
-Theorem one : forall P
+Theorem Theoremone : forall S, exists gamma:environment, exists l:label, exists T:TracePat,
+(progTyping gamma l S T) -> 
+(memTraceObliv gamma S).
+Proof.
+Admitted.

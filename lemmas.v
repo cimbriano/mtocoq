@@ -19,3 +19,57 @@ Definition memTraceObliv (gamma:environment) (S:program) : Prop :=
 forall M1 M2 t1 M1' t2 M2', (lowEquivalentMem M1 M2) ->
 (progSem M1 S t1 M1') -> (progSem M2 S t2 M2') ->
 ((traceequiv t1 t2) /\ (lowEquivalentMem M1' M2')).
+
+Fixpoint tracelen (t:trace) : nat :=
+match t with
+|epsilon => 0
+|concat t1 t2 => plus (tracelen t1) (tracelen t2)
+| _ => 1
+end.
+
+Lemma lemmaone : forall t1 t2, (traceequiv t1 t2) -> ((tracelen t1) = (tracelen t2)).
+Proof.
+intros t1 t2 H.
+induction H.
+reflexivity.
+symmetry.
+apply IHtraceequiv.
+simpl.
+rewrite plus_assoc.
+reflexivity.
+rewrite  <- IHtraceequiv2.
+apply IHtraceequiv1.
+simpl.
+apply IHtraceequiv.
+simpl.
+rewrite plus_0_r.
+apply IHtraceequiv.
+simpl.
+rewrite IHtraceequiv1.
+rewrite IHtraceequiv2.
+reflexivity.
+Qed.
+
+Fixpoint ithelement (t:trace) (i:nat) : trace :=
+match i with
+|O => epsilon
+|S O =>(
+match t with
+|read _ _ => t
+|write _ _ => t
+|readarr _ _ _ => t
+|writeatt _ _ _ => t
+|fetch _ => t
+|concat t1 t2 => (match t1 with 
+    |epsilon => ithelement t2 i 
+    | _ =>ithelement t1 i end)
+|_ => epsilon)
+)
+|S (S n) =>(
+match t with 
+|concat t1 t2 =>
+|_ => epsilon
+)
+end.
+
+Lemma lemmatwo
