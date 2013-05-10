@@ -58,17 +58,22 @@ match t with
 |read _ _ => t
 |write _ _ => t
 |readarr _ _ _ => t
-|writeatt _ _ _ => t
+|writearr _ _ _ => t
 |fetch _ => t
 |concat t1 t2 => (match t1 with 
     |epsilon => ithelement t2 i 
     | _ =>ithelement t1 i end)
-|_ => epsilon)
+|_ => epsilon
+end
 )
 |S (S n) =>(
 match t with 
 |concat t1 t2 =>
+if (ble_nat i (tracelen t1)) 
+then (ithelement t1 i) 
+else (ithelement t2 (minus i (tracelen t1)))
 |_ => epsilon
+end
 )
 end.
 
