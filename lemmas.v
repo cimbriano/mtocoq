@@ -8,50 +8,43 @@ Require Export Decidable.
 Require Export tactic_notations.
 
 Definition gammavalid (gamma:environment) (M:memory) : Prop :=
-  forall x l, ((gamma x = Some (lnat l)) <-> 
-    (exists n, (M x = Some (vint n l)))) /\ 
-    ((gamma x = Some (larr l)) <-> (exists a, (M x = Some (varr a l)))).
+forall x l, ((gamma x = Some (lnat l)) <-> (exists n, (M x = Some (vint n l))))
+/\ ((gamma x = Some (larr l)) <-> (exists a, (M x = Some (varr a l)))).
 
 
 Definition memTraceObliv (gamma:environment) (S:program) : Prop :=
-  forall M1 M2 t1 M1' t2 M2',
-   (lowEquivalentMem M1 M2) ->
-   (progSem M1 S t1 M1') ->
-   (progSem M2 S t2 M2') ->
-   ((traceequiv t1 t2) /\ (lowEquivalentMem M1' M2')).
+forall M1 M2 t1 M1' t2 M2', (lowEquivalentMem M1 M2) ->
+(progSem M1 S t1 M1') -> (progSem M2 S t2 M2') ->
+((traceequiv t1 t2) /\ (lowEquivalentMem M1' M2')).
 
 Fixpoint tracelen (t:trace) : nat :=
-  match t with
-  | epsilon      => 0
-  | concat t1 t2 => plus (tracelen t1) (tracelen t2)
-  | _ => 1
-  end.
+match t with
+|epsilon => 0
+|concat t1 t2 => plus (tracelen t1) (tracelen t2)
+| _ => 1
+end.
 
-Lemma lemmaone : forall t1 t2,
-  (traceequiv t1 t2) -> ((tracelen t1) = (tracelen t2)).
+Lemma lemmaone : forall t1 t2, (traceequiv t1 t2) -> ((tracelen t1) = (tracelen t2)).
 Proof.
-  intros t1 t2 H.
-  induction H.
-  Case "equal_equiv". reflexivity.
-  Case "refl_equiv". symmetry. apply IHtraceequiv.
-  Case "assoc_equiv". 
-    simpl.
-    rewrite plus_assoc.
-    reflexivity.
-  Case "trans_equiv".
-    rewrite  <- IHtraceequiv2.
-    apply IHtraceequiv1.
-  Case "epsilon_ident_equivl".
-    simpl. apply IHtraceequiv.
-  Case "epsilon_ident_equiv2".
-    simpl. 
-    rewrite plus_0_r.
-    apply IHtraceequiv.
-  Case "concat_decomp_equiv".
-    simpl.
-    rewrite IHtraceequiv1.
-    rewrite IHtraceequiv2.
-    reflexivity.
+intros t1 t2 H.
+induction H.
+reflexivity.
+symmetry.
+apply IHtraceequiv.
+simpl.
+rewrite plus_assoc.
+reflexivity.
+rewrite  <- IHtraceequiv2.
+apply IHtraceequiv1.
+simpl.
+apply IHtraceequiv.
+simpl.
+rewrite plus_0_r.
+apply IHtraceequiv.
+simpl.
+rewrite IHtraceequiv1.
+rewrite IHtraceequiv2.
+reflexivity.
 Qed.
 
 Fixpoint ithelement (t:trace) (i:nat) : trace :=
@@ -253,11 +246,11 @@ Qed.
 Lemma cancelminus : forall a b, (a<=b) -> (b-a+a=b).
 Proof.
 intros a b H.
-induction a.
-rewrite minus_n_O.
-rewrite plus_n_O.
-reflexivity.
-Admitted.
+rewrite plus_comm.
+symmetry.
+apply le_plus_minus.
+apply H.
+Qed.
 
 Lemma lemmatwo : forall i t, (ithelement t i <> epsilon) <-> ((le 1 i) /\ (le i (tracelen t))).
 Proof.
@@ -714,8 +707,29 @@ inversion H4.
 apply le_n_S.
 apply le_O_n.
 inversion H4.
-rewrite <- plus_comm in H5.
-admit.
+rewrite -> plus_comm in H5.
+assert (forall a b c, (a+b<=a+c)-> (b<=c)).
+intros a b c.
+induction a.
+rewrite plus_O_n.
+rewrite plus_O_n.
+intros Hsub.
+apply Hsub.
+intros Hsub.
+rewrite plus_Sn_m in Hsub.
+rewrite plus_Sn_m in Hsub.
+inversion Hsub.
+apply IHa.
+rewrite H7.
+apply le_refl.
+apply IHa.
+assert (a+b <= S (a+b)).
+apply le_n_Sn.
+apply le_trans with (S (a+b)).
+apply H8.
+apply H7.
+apply H6 with (tracelen HH1).
+apply H5.
 rewrite <- plus_Sn_m.
 
 rewrite H2.
