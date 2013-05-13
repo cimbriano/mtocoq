@@ -154,29 +154,16 @@ Qed.
 
 Lemma lemmatwo_3 : forall t n, (tracelen t = S (S n)) -> (exists t1, exists t2, t = concat t1 t2).
 Proof.
-intros t n.
-unfold tracelen.
-destruct t.
+  intros t n.
+  unfold tracelen.
 
-intros H.
-inversion H.
-intros H.
-inversion H.
-intros H.
-inversion H.
-intros H.
-inversion H.
-intros H.
-inversion H.
-intros H.
-inversion H.
-simpl.
-intros H.
-exists t1.
-exists t2.
-reflexivity.
-intros H.
-inversion H.
+  trace_cases (destruct t) Case;
+  try(intros H; inversion H).
+  
+  Case "concat".
+    exists t1.
+    exists t2.
+    reflexivity.
 Qed.
 
 (* Parameter P : nat -> Prop. *)
