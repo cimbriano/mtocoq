@@ -147,24 +147,9 @@ Qed.
 
 Lemma lemmatwo_2 : forall t, ithelement t 0 = epsilon.
 Proof.
-intros t.
-induction t.
-simpl.
-reflexivity.
-simpl.
-reflexivity.
-simpl.
-reflexivity.
-simpl.
-reflexivity.
-simpl.
-reflexivity.
-simpl.
-reflexivity.
-simpl.
-reflexivity.
-simpl.
-reflexivity.
+  intros t.
+  trace_cases (induction t) Case;
+  try(simpl; reflexivity).
 Qed.
 
 Lemma lemmatwo_3 : forall t n, (tracelen t = S (S n)) -> (exists t1, exists t2, t = concat t1 t2).
