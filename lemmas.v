@@ -5,6 +5,7 @@ Require Export core.
 Require Export semantics.
 Require Export typing.
 Require Export Decidable.
+Require Export tactic_notations.
 
 Definition gammavalid (gamma:environment) (M:memory) : Prop :=
   forall x l, ((gamma x = Some (lnat l)) <-> 
@@ -82,14 +83,6 @@ Fixpoint ithelement (t:trace) (i:nat) : trace :=
 end.
 
 Check ithelement.
-
-Tactic Notation "trace_cases" tactic(first) ident(c) :=
-  first;
-  [ Case_aux c "read" | Case_aux c "readarr" 
-  | Case_aux c "write" | Case_aux c "writearr" 
-  | Case_aux c "fetch" | Case_aux c "orambank" 
-  | Case_aux c "concat" | Case_aux c "epsilon"].
-
 
 Lemma lemmatwo_1 : forall t i, ((tracelen t)=0) -> (ithelement t i = epsilon).
 Proof.
