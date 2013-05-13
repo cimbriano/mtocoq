@@ -79,55 +79,70 @@ Check ithelement.
 
 Lemma lemmatwo_1 : forall t i, ((tracelen t)=0) -> (ithelement t i = epsilon).
 Proof.
-intros t i.
-intros H.
-induction ( t).
-inversion H.
-inversion H.
-inversion H.
-inversion H.
-inversion H.
-inversion H.
-simpl in H.
-apply plus_is_O in H.
-simpl.
-destruct i.
-reflexivity.
-destruct i.
-destruct H as [H1 H2].
-destruct t1.
-inversion H1.
-inversion H1.
-inversion H1.
-inversion H1.
-inversion H1.
-inversion H1.
-inversion H1.
-remember H1 as HH1.
-rewrite H1.
-simpl in H1.
-rewrite H1.
-apply IHt2.
-apply H2.
-apply IHt2.
-apply H2.
-assert ((ble_nat (S (S i)) (tracelen t1)) = false).
-inversion H as [H1 H2].
-rewrite H1.
-simpl.
-reflexivity.
-rewrite H0.
-inversion H as [H1 H2].
-rewrite H1.
-simpl.
-apply IHt2.
-apply H2.
-simpl.
-destruct i.
-reflexivity.
-destruct i.
-reflexivity.
-reflexivity.
+  intros t i.
+  intros H.
+  induction ( t).
+  Case "read". inversion H.
+  Case "readarr". inversion H.
+  Case "write". inversion H.
+  Case "writearr". inversion H.
+  Case "fetch". inversion H.
+  Case "orambank". inversion H.
+  Case "concat".
+    simpl in H.
+    apply plus_is_O in H.
+    simpl.
+    destruct i as [| i'].
+    SCase "i = 0'".
+      reflexivity.
+    SCase "i = S i'".
+      destruct i'.
+      SSCase "i = 1".
+      destruct H as [H1 H2].
+      destruct t1.
+      SSSCase "read". inversion H1.
+      SSSCase "readarr". inversion H1.
+      SSSCase "write". inversion H1.
+      SSSCase "writearr". inversion H1.
+      SSSCase "fetch". inversion H1.
+      SSSCase "orambank". inversion H1.
+      SSSCase "concat".
+        inversion H1.
+        remember H1 as HH1.
+        rewrite H1.
+        simpl in H1.
+        rewrite H1.
+        apply IHt2.
+        apply H2.
+      SSSCase "epsilon".
+        apply IHt2.
+        apply H2.
+
+
+      assert ((ble_nat (S (S i')) (tracelen t1)) = false).
+        inversion H as [H1 H2].
+        rewrite H1.
+        simpl. reflexivity.
+
+
+
+
+      rewrite H0.
+      inversion H as [H1 H2].
+      rewrite H1.
+      simpl.
+      apply IHt2.
+      apply H2.
+
+  Case "epsilon".
+    simpl.
+    destruct i.
+    SCase "i = O".
+      reflexivity.
+    SCase "i = S n".
+      destruct i.
+      SSCase "i = 1". reflexivity.
+      SSCase " i > 1". reflexivity.
 Qed.
 
 Lemma lemmatwo_2 : forall t, ithelement t 0 = epsilon.
