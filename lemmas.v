@@ -178,7 +178,7 @@ Lemma le_S :
   forall n m : nat,
     n <= S m -> n <= m \/ n = S m.
 Proof.
-  intros.
+  intros. (* omega solves the goal *)
   inversion H.
   right. reflexivity.
   left. assumption.
