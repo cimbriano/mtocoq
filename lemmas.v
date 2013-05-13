@@ -1,15 +1,9 @@
 Require Export Sflib.
-
 Require Export FSets.
-
 Require Export Peano.
-
 Require Export core.
-
 Require Export semantics.
-
 Require Export typing.
-
 Require Export Decidable.
 
 Definition gammavalid (gamma:environment) (M:memory) : Prop :=
@@ -60,31 +54,31 @@ Proof.
 Qed.
 
 Fixpoint ithelement (t:trace) (i:nat) : trace :=
-match i with
-|O => epsilon
-|S O =>(
-match t with
-|read _ _ => t
-|write _ _ => t
-|readarr _ _ _ => t
-|writearr _ _ _ => t
-|fetch _ => t
-|orambank _ => t
-|concat t1 t2 => (if( ble_nat 1 (tracelen t1) ) then
+  match i with
+  | O => epsilon
+  | S O =>
+
+    match t with
+    | read _ _ => t
+    | write _ _ => t
+    | readarr _ _ _ => t
+    | writearr _ _ _ => t
+    | fetch _ => t
+    | orambank _ => t
+    | concat t1 t2 => (if( ble_nat 1 (tracelen t1) ) then
                       ithelement t1 i else
                       ithelement t2 i)
-|_ => epsilon
-end
-)
-|S (S n) =>(
-match t with 
-|concat t1 t2 =>
-if (ble_nat i (tracelen t1)) 
-then (ithelement t1 i) 
-else (ithelement t2 (minus i (tracelen t1)))
-|_ => epsilon
-end
-)
+    |_ => epsilon
+    end
+
+  | S (S n) =>
+    match t with 
+    | concat t1 t2 =>
+      if (ble_nat i (tracelen t1)) 
+      then (ithelement t1 i) 
+      else (ithelement t2 (minus i (tracelen t1)))
+    | _ => epsilon
+    end
 end.
 
 Check ithelement.
