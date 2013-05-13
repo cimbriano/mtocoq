@@ -10,10 +10,6 @@ Require Export core.
 
 Definition array:Type :=  nat -> option nat.
 
-
-
-
-
 Definition mtoarrget (m:array) (n:mtoint) : mtoint :=
 match m n with
 |None => O
