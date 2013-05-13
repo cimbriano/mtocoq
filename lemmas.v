@@ -712,8 +712,29 @@ inversion H4.
 apply le_n_S.
 apply le_O_n.
 inversion H4.
-rewrite <- plus_comm in H5.
-admit.
+rewrite -> plus_comm in H5.
+assert (forall a b c, (a+b<=a+c)-> (b<=c)).
+intros a b c.
+induction a.
+rewrite plus_O_n.
+rewrite plus_O_n.
+intros Hsub.
+apply Hsub.
+intros Hsub.
+rewrite plus_Sn_m in Hsub.
+rewrite plus_Sn_m in Hsub.
+inversion Hsub.
+apply IHa.
+rewrite H7.
+apply le_refl.
+apply IHa.
+assert (a+b <= S (a+b)).
+apply le_n_Sn.
+apply le_trans with (S (a+b)).
+apply H8.
+apply H7.
+apply H6 with (tracelen HH1).
+apply H5.
 rewrite <- plus_Sn_m.
 
 rewrite H2.
