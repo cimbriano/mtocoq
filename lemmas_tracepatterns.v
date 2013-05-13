@@ -36,3 +36,8 @@ Fixpoint ithelement_tp (tp:TracePat) (i:nat) : TracePat:=
       | _ => Epsilon
       end
   end.
+
+Lemma lemma_five : forall (tp1 tp2 : TracePat),
+  tracePequiv tp1 tp2 <-> 
+  forall (i:nat),
+    (ithelement_tp tp1 i) = (ithelement_tp tp2 i).
