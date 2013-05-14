@@ -1,19 +1,15 @@
 Require Export Sflib.
-
 Require Export FSets.
-
 Require Export Peano.
-
 Require Export core.
-
 Require Export semantics.
-
 Require Export typing.
+Require Export tactic_notations.
 
-Fixpoint tracepat_len (tp : TracePat) (i : nat) :=
+Fixpoint tracepat_len (tp : TracePat) : nat :=
   match tp with
   | Epsilon => 0
-  | Concat tp1 tp2 => plus (tracepat_len tp1 i) (tracepat_len tp2 i) 
+  | Concat tp1 tp2 => plus (tracepat_len tp1) (tracepat_len tp2)
   | _ => 1
   end.
 
