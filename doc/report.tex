@@ -1,6 +1,9 @@
-\documentclass[10pt,  twocolumn]{IEEEtran}
+\documentclass[10pt,  twocolumn]{article}
 \usepackage{enumerate}
 \usepackage{url}
+
+%To use \citeauthor
+\usepackage[numbers]{natbib}
 
 \begin{document}
 
@@ -17,16 +20,41 @@
 
 \begin{abstract}
 % Summarizing your motivation and your accomplishments.
-\end{abstract}
+In a traditional security model, known as non-interference, a program's inputs and outputs are given security labels indicating that data's sensitivity; \emph{low} and \emph{high}.
+\emph{Low} variables are those data that are public or can be infrared from publicly available information, whereas \emph{high} variables are secret or private data.
+The non-interference model seeks to maintain the secrecy of \emph{high} variables by ensuring that all program executions with identical \emph{low} (public) inputs produce the same \emph{low} outputs.
 
+While non-interference is a strong security model in theory, in practice real executing programs "leak" information about its data through a number of channels - timing, electromagnetic radiation, power consumption, and execution trace, to name a few.
+\citeauthor{mtope} presented a type system to efficiently address information leakage via a program execution trace.
+The proofs presented by \citeauthor{mtope} are presented in human-readable format but lack a corresponding proof certificate from verified proof assistant.
+
+We present the foundation necessary to implement and verify the proofs by \citeauthor{mtope}.
+In section \emph{SECTION LABEL}, we outline our approach.
+In section \emph{SECTION LABEL}, we discuss challenges both technical and not.
+\emph{FLESH THIS PART OUT}
+
+\end{abstract}
 
 \section{Introduction}
 \label{sec:introduction}
 % Summarizing your motivation and your accomplishments.
-\cite{flickrpy}
+\cite{techreport}
 
-\section{Intermediate}
+
 % The intermediate sections should contain full details about what you did.
+\section {Approach}
+
+\section{Challenges}
+
+% Technical Challenges
+
+% Non-technical Challenges
+
+% Proofs were written by humans for humans.
+% Many times there we're "abuses of notation", "lemma 5 is proved using a similar technique as lemma 4"
+	% which resulted in requiring more infrastructure/definitions than we initially envisioned
+	
+
 
 \section{Related Work}
 \label{sec:relatedwork}
@@ -43,7 +71,7 @@
 %
 %- Choosing to represent trace equivalence and trace pattern equivalence as Relations instead of functions (because they're only used in a relational way)
 
-\bibliographystyle{IEEEtran}
+\bibliographystyle{plainnat}
 \bibliography{report}
 
 
