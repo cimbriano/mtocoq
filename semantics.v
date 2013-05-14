@@ -132,7 +132,7 @@ with progSem : memory -> program -> trace -> memory -> Prop :=
       (progSem M (progcat S1 S2) (concat t1 t2) M2).
 
 Definition lowEquivalentMem (M1 M2: memory):  Prop :=
- (forall x v, (M1 x = Some (vint v low)) <-> (M2 x = Some (vint v low))) \/
+ (forall x v, (M1 x = Some (vint v low)) <-> (M2 x = Some (vint v low))) /\
  (forall x v, (M1 x = Some (varr v low)) <-> (M2 x = Some (varr v low))).
 
 Inductive traceequiv: trace -> trace -> Prop:=
