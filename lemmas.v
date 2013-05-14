@@ -14,6 +14,7 @@ forall x l, ((gamma x = Some (lnat l)) <-> (exists n, (M x = Some (vint n l))))
 
 Definition memTraceObliv (gamma:environment) (S:program) : Prop :=
 forall M1 M2 t1 M1' t2 M2', (lowEquivalentMem M1 M2) ->
+(gammavalid gamma M1) -> (gammavalid gamma M2) ->
 (progSem M1 S t1 M1') -> (progSem M2 S t2 M2') ->
 ((traceequiv t1 t2) /\ (lowEquivalentMem M1' M2')).
 
@@ -84,9 +85,7 @@ Lemma lemmatwo_1 : forall t i, ((tracelen t)=0) -> (ithelement t i = epsilon).
 Proof.
   intros t i.
   intros H.
-
-  trace_cases (induction t) Case.
-
+  induction ( t).
   Case "read". inversion H.
   Case "readarr". inversion H.
   Case "write". inversion H.
@@ -104,9 +103,7 @@ Proof.
       destruct i'.
       SSCase "i = 1".
       destruct H as [H1 H2].
-
-      trace_cases (destruct t1) SSSCase.
-
+      destruct t1.
       SSSCase "read". inversion H1.
       SSSCase "readarr". inversion H1.
       SSSCase "write". inversion H1.

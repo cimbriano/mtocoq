@@ -26,15 +26,15 @@ Inductive TracePat : Type :=
   | Epsilon    : TracePat.
 
 Inductive tracePequiv: TracePat -> TracePat -> Prop:=
-  | epsilon_equiv: tracePequiv Epsilon Epsilon
-  | O_equiv : forall n, tracePequiv (Orambank n) (Orambank n)
-  | read_equiv : forall x, tracePequiv (Read x) (Read x)
-  | fetch_equiv: forall p, tracePequiv (Fetch p) (Fetch p)
-  | assoc_equiv: forall t1 t2 t3, tracePequiv (Concat (Concat t1 t2) t3) (Concat t1 (Concat t2 t3))
-  | trans_equiv: forall t1 t2 t3, (tracePequiv t1 t2) -> (tracePequiv t2 t3) -> (tracePequiv t1 t3)
-  | epsilon_ident_equivl: forall T, (tracePequiv T T) -> tracePequiv T (Concat Epsilon T)
-  | epsilon_ident_equivr: forall T, (tracePequiv T T) -> tracePequiv T (Concat T Epsilon)
-  | concat_decomp_equiv: forall T11 T21 T12 T22,
+  | Pepsilon_equiv: tracePequiv Epsilon Epsilon
+  | PO_equiv : forall n, tracePequiv (Orambank n) (Orambank n)
+  | Pread_equiv : forall x, tracePequiv (Read x) (Read x)
+  | Pfetch_equiv: forall p, tracePequiv (Fetch p) (Fetch p)
+  | Passoc_equiv: forall t1 t2 t3, tracePequiv (Concat (Concat t1 t2) t3) (Concat t1 (Concat t2 t3))
+  | Ptrans_equiv: forall t1 t2 t3, (tracePequiv t1 t2) -> (tracePequiv t2 t3) -> (tracePequiv t1 t3)
+  | Pepsilon_ident_equivl: forall T, (tracePequiv T T) -> tracePequiv T (Concat Epsilon T)
+  | Pepsilon_ident_equivr: forall T, (tracePequiv T T) -> tracePequiv T (Concat T Epsilon)
+  | Pconcat_decomp_equiv: forall T11 T21 T12 T22,
   (tracePequiv T11 T12) -> (tracePequiv T21 T22) ->
   (tracePequiv (Concat T11 T21) (Concat T12 T22))
   .
