@@ -1,3 +1,32 @@
+Reflections / ToDo
+
+- Significant duplication as a result of the defintion of labeledValue
+	Current:
+	Inductive labeledValue : Type :=
+	|vint : mtoint -> label -> labeledValue
+	|varr : array -> label -> labeledValue.
+
+	We'd (now) prefer one labeledValue constructor
+	that takes a "value" which can be either a mtoint
+	or an array.
+
+- The choice to index arrays at 1 has caused some added complexity
+	* In proofs, destruct nat, 0 case is easy.
+		In > 0 case. Destruct again for 1 case and > 2
+
+
+
+- Lemmas used so far in Theorem 1.
+	* Lemma 6
+	* Lemma 7
+	* Lemma 12
+
+- Trace Pattern analogs to trace lemma 1, (2, 3, 4, helpers ?)
+
+- Tactic Notation for statements, programs, other inductively defined things
+
+
+
 Other Things
 
 Partial Derivative Automata Formalized in Coq
