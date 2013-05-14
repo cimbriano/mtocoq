@@ -59,6 +59,37 @@ Proof.
 Qed.
 
 
+Lemma lemma_two_1_tracepat : forall (T:TracePat) (i:nat),
+  ((tracepat_len T) = 0) -> (ithelement_tp T i = Epsilon).
+Proof.
+  intros.
+
+  trace_pattern_cases (induction T) Case;
+  try (inversion H).
+
+  Case "Concat".
+    destruct i.
+    SCase "i = 0". reflexivity.
+
+    SCase "i > 0".
+      destruct i.
+
+      SSCase "i = 1".
+
+        trace_pattern_cases (destruct T1) SSSCase;
+        try (intuition).
+
+        SSSCase "Concat". intuition.
+  Case "Epsilon".
+    destruct i.
+    SCase "i = 0". reflexivity.
+    SCase "i > 0".
+      destruct i.
+      SSCase "i = 1". reflexivity.
+      SSCase "i > 1". reflexivity.
+Qed.
+
+
 Lemma lemma_five : forall (tp1 tp2 : TracePat),
   tracePequiv tp1 tp2 <-> 
   forall (i:nat),
