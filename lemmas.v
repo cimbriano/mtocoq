@@ -26,25 +26,24 @@ Fixpoint tracelen (t:trace) : nat :=
 
 Lemma lemmaone : forall t1 t2, (traceequiv t1 t2) -> ((tracelen t1) = (tracelen t2)).
 Proof.
-intros t1 t2 H.
-induction H.
-reflexivity.
-symmetry.
-apply IHtraceequiv.
-simpl.
-rewrite plus_assoc.
-reflexivity.
-rewrite  <- IHtraceequiv2.
-apply IHtraceequiv1.
-simpl.
-apply IHtraceequiv.
-simpl.
-rewrite plus_0_r.
-apply IHtraceequiv.
-simpl.
-rewrite IHtraceequiv1.
-rewrite IHtraceequiv2.
-reflexivity.
+  intros t1 t2 H.
+
+  trace_equiv_cases (induction H) Case;
+  try (reflexivity).
+
+  Case "refl_equiv".
+    symmetry. apply IHtraceequiv.
+  Case "assoc_equiv".
+    simpl.  rewrite plus_assoc.  reflexivity.
+  Case "trans_equiv".
+    rewrite  <- IHtraceequiv2.  apply IHtraceequiv1.
+  Case "epsilon_ident_equivr".
+    simpl.  rewrite plus_0_r. reflexivity.
+  Case "concat_decomp_equiv".
+    simpl.
+    rewrite IHtraceequiv1.
+    rewrite IHtraceequiv2.
+    reflexivity.
 Qed.
 
 Fixpoint ithelement (t:trace) (i:nat) : trace :=
