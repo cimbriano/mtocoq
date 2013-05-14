@@ -98,6 +98,21 @@ Proof.
   try (simpl; reflexivity).
 Qed.
 
+Lemma lemma_two_3_tracepat : forall (T:TracePat) (n:nat),
+  (tracepat_len T = S (S n)) ->
+  (exists T1, exists T2, T = Concat T1 T2).
+Proof.
+  intros T n.
+  unfold tracepat_len.
+
+  trace_pattern_cases (destruct T) Case;
+  try (intros H; inversion H).
+
+  Case "Concat".
+    exists T1.
+    exists T2.
+    reflexivity.
+Qed.
 
 Lemma lemma_five : forall (tp1 tp2 : TracePat),
   tracePequiv tp1 tp2 <-> 
