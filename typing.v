@@ -14,7 +14,7 @@ Inductive TracePat : Type :=
   | Write      : variable -> TracePat
   | Readarr    : variable -> TracePat
   | Writearr   : variable -> TracePat
-  | Loop       : location -> TracePat -> TracePat-> TracePat
+  | Loop       : location -> TracePat -> TracePat -> TracePat
   | Fetch      : location -> TracePat
   | Orambank   : orambank -> TracePat
   | Concat     : TracePat -> TracePat -> TracePat
@@ -23,17 +23,31 @@ Inductive TracePat : Type :=
 
 Inductive tracePequiv: TracePat -> TracePat -> Prop:=
   | epsilon_equiv: tracePequiv Epsilon Epsilon
+
   | O_equiv : forall n, tracePequiv (Orambank n) (Orambank n)
+
   | read_equiv : forall x, tracePequiv (Read x) (Read x)
+
   | fetch_equiv: forall p, tracePequiv (Fetch p) (Fetch p)
-  | assoc_equiv: forall t1 t2 t3, tracePequiv (Concat (Concat t1 t2) t3) (Concat t1 (Concat t2 t3))
-  | trans_equiv: forall t1 t2 t3, (tracePequiv t1 t2) -> (tracePequiv t2 t3) -> (tracePequiv t1 t3)
-  | epsilon_ident_equivl: forall T, (tracePequiv T T) -> tracePequiv T (Concat Epsilon T)
-  | epsilon_ident_equivr: forall T, (tracePequiv T T) -> tracePequiv T (Concat T Epsilon)
+
+  | assoc_equiv: forall t1 t2 t3,
+      tracePequiv (Concat (Concat t1 t2) t3) (Concat t1 (Concat t2 t3))
+
+  | trans_equiv: forall t1 t2 t3,
+      (tracePequiv t1 t2) ->
+      (tracePequiv t2 t3) ->
+      (tracePequiv t1 t3)
+
+  | epsilon_ident_equivl: forall T, 
+      (tracePequiv T T) -> tracePequiv T (Concat Epsilon T)
+
+  | epsilon_ident_equivr: forall T,
+      (tracePequiv T T) -> tracePequiv T (Concat T Epsilon)
+
   | concat_decomp_equiv: forall T11 T21 T12 T22,
-  (tracePequiv T11 T12) -> (tracePequiv T21 T22) ->
-  (tracePequiv (Concat T11 T21) (Concat T12 T22))
-  .
+      (tracePequiv T11 T12) ->
+      (tracePequiv T21 T22) ->
+      (tracePequiv (Concat T11 T21) (Concat T12 T22)).
 
 Fixpoint TracePRemEpsilon t :=
   match t with
@@ -81,16 +95,23 @@ Definition evttracePat l t:  TracePat :=
   end.
 
 
-Inductive exprTyping: environment -> expression ->labeledType -> TracePat ->Prop :=
-|TVar : forall (gamma:environment) (x:variable) l,
-((gamma x) =(Some (lnat l)))  -> (exprTyping gamma (exvar x) (lnat l) (evttracePat l (Read x)))
-|TCon : forall (gamma:environment) n, exprTyping gamma (exnum n) (lnat low) Epsilon
-|TOp : forall (gamma:environment) e1 e2 l1 l2 T1 T2 op,
-(exprTyping gamma e1 (lnat l1) T1) -> (exprTyping gamma e2 (lnat l2) T2) ->
-(exprTyping gamma (exop e1 op e2) (lnat (mtojoin l1 l2)) (Concat T1 T2))
-|TArr : forall (gamma:environment) x e l l2 T, ((gamma x) =(Some (larr l))) ->
-(exprTyping gamma e (lnat l2) T) -> (lable l2 l) ->
-(exprTyping gamma (exarr x e) (lnat (mtojoin l l2)) (Concat T (evttracePat l (Readarr x)))).
+Inductive exprTyping: environment -> expression -> labeledType -> TracePat -> Prop :=
+  | TVar : forall (gamma:environment) (x:variable) l,
+      ((gamma x) = (Some (lnat l))) ->
+      (exprTyping gamma (exvar x) (lnat l) (evttracePat l (Read x)))
+
+  | TCon : forall (gamma:environment) n, exprTyping gamma (exnum n) (lnat low) Epsilon
+
+  | TOp : forall (gamma:environment) e1 e2 l1 l2 T1 T2 op,
+      (exprTyping gamma e1 (lnat l1) T1) ->
+      (exprTyping gamma e2 (lnat l2) T2) ->
+      (exprTyping gamma (exop e1 op e2) (lnat (mtojoin l1 l2)) (Concat T1 T2))
+
+  | TArr : forall (gamma:environment) x e l l2 T,
+      ((gamma x) =(Some (larr l))) ->
+      (exprTyping gamma e (lnat l2) T) ->
+      (lable l2 l) ->
+      (exprTyping gamma (exarr x e) (lnat (mtojoin l l2)) (Concat T (evttracePat l (Readarr x)))).
 
 
 Inductive select : TracePat -> TracePat -> TracePat -> Prop :=
