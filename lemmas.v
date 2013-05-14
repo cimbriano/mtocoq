@@ -745,3 +745,28 @@ simpl in HFOO.
 inversion HFOO.
 Qed.
 
+Fixpoint numblocks t : nat :=
+match t with
+| concat a b => numblocks a + numblocks b
+| _ => 1
+end.
+
+Inductive curlyless :trace -> trace -> Prop :=
+| fewerblocks : forall t1 t2, (numblocks t1 <= numblocks t2) -> (curlyless t1 t2)
+| othercurlyless1 : forall t1' t1'' t2' t2'', 
+(numblocks t1' + numblocks t1'' = numblocks t2' + numblocks t2'') ->
+(numblocks t1' >numblocks t2') -> (curlyless (concat t1' t1'') (concat t2' t2''))
+| othercurlyless2 : forall t1' t1'' t2' t2'', 
+(numblocks t1' + numblocks t1'' = numblocks t2' + numblocks t2'') ->
+(numblocks t1'  = numblocks t2') -> (curlyless t1' t2') ->
+(curlyless (concat t1' t1'') (concat t2' t2''))
+| othercurlyless3 : forall t1' t1'' t2' t2'', 
+(numblocks t1' + numblocks t1'' = numblocks t2' + numblocks t2'') ->
+(t1' = t2') -> (curlyless t1'' t2'') ->
+(curlyless (concat t1' t1'') (concat t2' t2'')).
+
+Lemma lemmatwelve : forall gamma l0 S1 S2 T1 T2 M1 M2 M1' M2' t1 t2,
+(progTyping gamma l0 S1 T1) -> (progTyping gamma l0 S2 T2)
+
+
+
