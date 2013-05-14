@@ -2,5 +2,9 @@
 *.vo
 *.glob
 *.v.d
+  # CoqIDE temp files have the pattern #<stuff>#
 \#*
 
+# LaTeX
+*.pdf
+*.log
