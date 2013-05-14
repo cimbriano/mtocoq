@@ -7,6 +7,10 @@ Issues/Difficulties/Notes
 - Handling of arrays
 	* Will this constrain extending the type system to allow each element of an array to occupy its own OramBank?
 
+- Many variables to keep track of.
+	* A lot of quantified variables in the statement of the theorem
+
+
 Other Things
 
 Partial Derivative Automata Formalized in Coq
