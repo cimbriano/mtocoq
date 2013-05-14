@@ -84,7 +84,9 @@ Lemma lemmatwo_1 : forall t i, ((tracelen t)=0) -> (ithelement t i = epsilon).
 Proof.
   intros t i.
   intros H.
-  induction ( t).
+
+  trace_cases (induction t) Case.
+
   Case "read". inversion H.
   Case "readarr". inversion H.
   Case "write". inversion H.
@@ -102,7 +104,9 @@ Proof.
       destruct i'.
       SSCase "i = 1".
       destruct H as [H1 H2].
-      destruct t1.
+
+      trace_cases (destruct t1) SSSCase.
+
       SSSCase "read". inversion H1.
       SSSCase "readarr". inversion H1.
       SSSCase "write". inversion H1.
