@@ -751,7 +751,23 @@ Inductive curlyless :trace -> trace -> Prop :=
 (curlyless (concat t1' t1'') (concat t2' t2'')).
 
 Lemma lemmatwelve : forall gamma l0 S1 S2 T1 T2 M1 M2 M1' M2' t1 t2,
-(progTyping gamma l0 S1 T1) -> (progTyping gamma l0 S2 T2)
+(progTyping gamma l0 S1 T1) -> (progTyping gamma l0 S2 T2) ->
+(tracePequiv T1 T2) -> (gammavalid gamma M1) -> (gammavalid gamma M2) ->
+(progSem M1 S1 t1 M1') -> (progSem M2 S2 t2 M2') ->
+((lowEquivalentMem M2' M2') /\ (traceequiv t1 t2)).
+Proof. Admitted.
+
+Lemma lemmasix : forall gamma e T M1 M2 t1 t2 n1 n2,
+(exprTyping gamma e (lnat low) T) -> (gammavalid gamma M1) ->
+(gammavalid gamma M2) -> (exprSem M1 e t1 n1) ->
+(exprSem M2 e t2 n2) -> ((t1 = t2) /\ (n1 = n2)).
+Proof. Admitted.
+
+Lemma lemmaseven : forall gamma e l T M1 M2 t1 t2 n1 n2,
+(exprTyping gamma e (lnat (o_high l)) T) -> (gammavalid gamma M1) ->
+(gammavalid gamma M2) -> (exprSem M1 e t1 n1) ->
+(exprSem M2 e t2 n2) -> (t1 = t2).
+Proof. Admitted.
 
 
 
