@@ -1,4 +1,6 @@
+# Coq Ignores
 *.vo
 *.glob
 *.v.d
+\#*
 
