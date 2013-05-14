@@ -114,6 +114,11 @@ Proof.
     reflexivity.
 Qed.
 
+Lemma lemma_two_tracepat : forall (i:nat) (T:TracePat),
+  (ithelement_tp T i <> Epsilon) <-> ((le 1 i) /\ (le i (tracepat_len T))).
+
+
+
 Lemma lemma_five : forall (tp1 tp2 : TracePat),
   tracePequiv tp1 tp2 <-> 
   forall (i:nat),
