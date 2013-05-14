@@ -222,21 +222,21 @@ Qed.
 
 Lemma lemma_plusright : forall a b, a<=a+b.
 Proof.
-induction a.
-apply le_O_n.
-intros b.
-rewrite plus_Sn_m.
-apply le_n_S.
-apply IHa.
+  induction a.
+  apply le_O_n.
+  intros b.
+  rewrite plus_Sn_m.
+  apply le_n_S.
+  apply IHa.
 Qed.
 
 Lemma cancelminus : forall a b, (a<=b) -> (b-a+a=b).
 Proof.
-intros a b H.
-rewrite plus_comm.
-symmetry.
-apply le_plus_minus.
-apply H.
+  intros a b H.
+  rewrite plus_comm.
+  symmetry.
+  apply le_plus_minus.
+  apply H.
 Qed.
 
 Lemma lemmatwo : forall i t, (ithelement t i <> epsilon) <-> ((le 1 i) /\ (le i (tracelen t))).
