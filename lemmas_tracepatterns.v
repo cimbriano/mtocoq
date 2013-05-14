@@ -1,4 +1,5 @@
 Require Export Sflib.
+Require Export strong_induction.
 Require Export FSets.
 Require Export Peano.
 Require Export core.
