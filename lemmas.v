@@ -1,16 +1,11 @@
 Require Export Sflib.
-
 Require Export FSets.
-
 Require Export Peano.
-
 Require Export core.
-
 Require Export semantics.
-
 Require Export typing.
-
 Require Export Decidable.
+Require Export tactic_notations.
 
 Definition gammavalid (gamma:environment) (M:memory) : Prop :=
 forall x l, ((gamma x = Some (lnat l)) <-> (exists n, (M x = Some (vint n l))))
@@ -23,165 +18,155 @@ forall M1 M2 t1 M1' t2 M2', (lowEquivalentMem M1 M2) ->
 ((traceequiv t1 t2) /\ (lowEquivalentMem M1' M2')).
 
 Fixpoint tracelen (t:trace) : nat :=
-match t with
-|epsilon => 0
-|concat t1 t2 => plus (tracelen t1) (tracelen t2)
-| _ => 1
-end.
+  match t with
+  | epsilon => 0
+  | concat t1 t2 => plus (tracelen t1) (tracelen t2)
+  | _ => 1
+  end.
 
 Lemma lemmaone : forall t1 t2, (traceequiv t1 t2) -> ((tracelen t1) = (tracelen t2)).
 Proof.
-intros t1 t2 H.
-induction H.
-reflexivity.
-symmetry.
-apply IHtraceequiv.
-simpl.
-rewrite plus_assoc.
-reflexivity.
-rewrite  <- IHtraceequiv2.
-apply IHtraceequiv1.
-simpl.
-apply IHtraceequiv.
-simpl.
-rewrite plus_0_r.
-apply IHtraceequiv.
-simpl.
-rewrite IHtraceequiv1.
-rewrite IHtraceequiv2.
-reflexivity.
+  intros t1 t2 H.
+
+  trace_equiv_cases (induction H) Case;
+  try (reflexivity).
+
+  Case "refl_equiv".
+    symmetry. apply IHtraceequiv.
+
+  Case "assoc_equiv".
+    simpl.  rewrite plus_assoc.  reflexivity.
+
+  Case "trans_equiv".
+    rewrite  <- IHtraceequiv2.  apply IHtraceequiv1.
+
+  Case "epsilon_ident_equivr".
+    simpl.  rewrite plus_0_r. reflexivity.
+
+  Case "concat_decomp_equiv".
+    simpl.
+    rewrite IHtraceequiv1.
+    rewrite IHtraceequiv2.
+    reflexivity.
 Qed.
 
 Fixpoint ithelement (t:trace) (i:nat) : trace :=
-match i with
-|O => epsilon
-|S O =>(
-match t with
-|read _ _ => t
-|write _ _ => t
-|readarr _ _ _ => t
-|writearr _ _ _ => t
-|fetch _ => t
-|orambank _ => t
-|concat t1 t2 => (if( ble_nat 1 (tracelen t1) ) then
+  match i with
+  | O => epsilon
+  | S O =>
+
+    match t with
+    | read _ _ => t
+    | write _ _ => t
+    | readarr _ _ _ => t
+    | writearr _ _ _ => t
+    | fetch _ => t
+    | orambank _ => t
+    | concat t1 t2 => (if( ble_nat 1 (tracelen t1) ) then
                       ithelement t1 i else
                       ithelement t2 i)
-|_ => epsilon
-end
-)
-|S (S n) =>(
-match t with 
-|concat t1 t2 =>
-if (ble_nat i (tracelen t1)) 
-then (ithelement t1 i) 
-else (ithelement t2 (minus i (tracelen t1)))
-|_ => epsilon
-end
-)
+    |_ => epsilon
+    end
+
+  | S (S n) =>
+    match t with 
+    | concat t1 t2 =>
+      if (ble_nat i (tracelen t1)) 
+      then (ithelement t1 i) 
+      else (ithelement t2 (minus i (tracelen t1)))
+    | _ => epsilon
+    end
 end.
 
 Check ithelement.
 
 Lemma lemmatwo_1 : forall t i, ((tracelen t)=0) -> (ithelement t i = epsilon).
 Proof.
-intros t i.
-intros H.
-induction ( t).
-inversion H.
-inversion H.
-inversion H.
-inversion H.
-inversion H.
-inversion H.
-simpl in H.
-apply plus_is_O in H.
-simpl.
-destruct i.
-reflexivity.
-destruct i.
-destruct H as [H1 H2].
-destruct t1.
-inversion H1.
-inversion H1.
-inversion H1.
-inversion H1.
-inversion H1.
-inversion H1.
-inversion H1.
-remember H1 as HH1.
-rewrite H1.
-simpl in H1.
-rewrite H1.
-apply IHt2.
-apply H2.
-apply IHt2.
-apply H2.
-assert ((ble_nat (S (S i)) (tracelen t1)) = false).
-inversion H as [H1 H2].
-rewrite H1.
-simpl.
-reflexivity.
-rewrite H0.
-inversion H as [H1 H2].
-rewrite H1.
-simpl.
-apply IHt2.
-apply H2.
-simpl.
-destruct i.
-reflexivity.
-destruct i.
-reflexivity.
-reflexivity.
+  intros t i.
+  intros H.
+  induction ( t).
+  Case "read". inversion H.
+  Case "readarr". inversion H.
+  Case "write". inversion H.
+  Case "writearr". inversion H.
+  Case "fetch". inversion H.
+  Case "orambank". inversion H.
+  Case "concat".
+    simpl in H.
+    apply plus_is_O in H.
+    simpl.
+    destruct i as [| i'].
+    SCase "i = 0'".
+      reflexivity.
+    SCase "i = S i'".
+      destruct i'.
+      SSCase "i = 1".
+      destruct H as [H1 H2].
+      destruct t1.
+      SSSCase "read". inversion H1.
+      SSSCase "readarr". inversion H1.
+      SSSCase "write". inversion H1.
+      SSSCase "writearr". inversion H1.
+      SSSCase "fetch". inversion H1.
+      SSSCase "orambank". inversion H1.
+      SSSCase "concat".
+        inversion H1.
+        remember H1 as HH1.
+        rewrite H1.
+        simpl in H1.
+        rewrite H1.
+        apply IHt2.
+        apply H2.
+      SSSCase "epsilon".
+        apply IHt2.
+        apply H2.
+
+
+      assert ((ble_nat (S (S i')) (tracelen t1)) = false).
+        inversion H as [H1 H2].
+        rewrite H1.
+        simpl. reflexivity.
+
+
+
+
+      rewrite H0.
+      inversion H as [H1 H2].
+      rewrite H1.
+      simpl.
+      apply IHt2.
+      apply H2.
+
+  Case "epsilon".
+    simpl.
+    destruct i.
+    SCase "i = O".
+      reflexivity.
+    SCase "i = S n".
+      destruct i.
+      SSCase "i = 1". reflexivity.
+      SSCase " i > 1". reflexivity.
 Qed.
 
 Lemma lemmatwo_2 : forall t, ithelement t 0 = epsilon.
 Proof.
-intros t.
-induction t.
-simpl.
-reflexivity.
-simpl.
-reflexivity.
-simpl.
-reflexivity.
-simpl.
-reflexivity.
-simpl.
-reflexivity.
-simpl.
-reflexivity.
-simpl.
-reflexivity.
-simpl.
-reflexivity.
+  intros t.
+  trace_cases (induction t) Case;
+  try(simpl; reflexivity).
 Qed.
 
 Lemma lemmatwo_3 : forall t n, (tracelen t = S (S n)) -> (exists t1, exists t2, t = concat t1 t2).
 Proof.
-intros t n.
-unfold tracelen.
-destruct t.
+  intros t n.
+  unfold tracelen.
 
-intros H.
-inversion H.
-intros H.
-inversion H.
-intros H.
-inversion H.
-intros H.
-inversion H.
-intros H.
-inversion H.
-intros H.
-inversion H.
-simpl.
-intros H.
-exists t1.
-exists t2.
-reflexivity.
-intros H.
-inversion H.
+  trace_cases (destruct t) Case;
+  try(intros H; inversion H).
+  
+  Case "concat".
+    exists t1.
+    exists t2.
+    reflexivity.
 Qed.
 
 (* Parameter P : nat -> Prop. *)
@@ -196,7 +181,7 @@ Lemma le_S :
   forall n m : nat,
     n <= S m -> n <= m \/ n = S m.
 Proof.
-  intros.
+  intros. (* omega solves the goal *)
   inversion H.
   right. reflexivity.
   left. assumption.
@@ -240,21 +225,21 @@ Qed.
 
 Lemma lemma_plusright : forall a b, a<=a+b.
 Proof.
-induction a.
-apply le_O_n.
-intros b.
-rewrite plus_Sn_m.
-apply le_n_S.
-apply IHa.
+  induction a.
+  apply le_O_n.
+  intros b.
+  rewrite plus_Sn_m.
+  apply le_n_S.
+  apply IHa.
 Qed.
 
 Lemma cancelminus : forall a b, (a<=b) -> (b-a+a=b).
 Proof.
-intros a b H.
-rewrite plus_comm.
-symmetry.
-apply le_plus_minus.
-apply H.
+  intros a b H.
+  rewrite plus_comm.
+  symmetry.
+  apply le_plus_minus.
+  apply H.
 Qed.
 
 Lemma lemmatwo : forall i t, (ithelement t i <> epsilon) <-> ((le 1 i) /\ (le i (tracelen t))).
