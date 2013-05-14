@@ -90,6 +90,15 @@ Proof.
 Qed.
 
 
+Lemma lemma_two_2_tracepat : forall (T:TracePat),
+  ithelement_tp T 0 = Epsilon.
+Proof.
+  intros T.
+  trace_pattern_cases (induction T) Case;
+  try (simpl; reflexivity).
+Qed.
+
+
 Lemma lemma_five : forall (tp1 tp2 : TracePat),
   tracePequiv tp1 tp2 <-> 
   forall (i:nat),
