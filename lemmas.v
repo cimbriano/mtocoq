@@ -33,12 +33,16 @@ Proof.
 
   Case "refl_equiv".
     symmetry. apply IHtraceequiv.
+
   Case "assoc_equiv".
     simpl.  rewrite plus_assoc.  reflexivity.
+
   Case "trans_equiv".
     rewrite  <- IHtraceequiv2.  apply IHtraceequiv1.
+
   Case "epsilon_ident_equivr".
     simpl.  rewrite plus_0_r. reflexivity.
+
   Case "concat_decomp_equiv".
     simpl.
     rewrite IHtraceequiv1.
