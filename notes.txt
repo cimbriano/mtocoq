@@ -1,16 +1,3 @@
-Issues/Difficulties/Notes
-
-- Duplication in definitions, lemmas, proofs for traces and trace patterns
-
-- Choosing to represent trace equivalence and trace pattern equivalence as Relations instead of functions (because they're only used in a relational way)
-
-- Handling of arrays
-	* Will this constrain extending the type system to allow each element of an array to occupy its own OramBank?
-
-- Many variables to keep track of.
-	* A lot of quantified variables in the statement of the theorem
-
-
 Other Things
 
 Partial Derivative Automata Formalized in Coq

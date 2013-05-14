@@ -46,15 +46,20 @@ In section \emph{SECTION LABEL}, we discuss challenges both technical and not.
 
 \section{Challenges}
 
-% Technical Challenges
-
-% Non-technical Challenges
-
 % Proofs were written by humans for humans.
 % Many times there we're "abuses of notation", "lemma 5 is proved using a similar technique as lemma 4"
 	% which resulted in requiring more infrastructure/definitions than we initially envisioned
 	
 
+%- Duplication in definitions, lemmas, proofs for traces and trace patterns
+%
+%- Choosing to represent trace equivalence and trace pattern equivalence as Relations instead of functions (because they're only used in a relational way)
+%
+%- Handling of arrays
+%	* Will this constrain extending the type system to allow each element of an array to occupy its own OramBank?
+%
+%- Many variables to keep track of.
+%	* A lot of quantified variables in the statement of the theorem
 
 \section{Related Work}
 \label{sec:relatedwork}
