@@ -99,10 +99,15 @@ Inductive statementTyping: environment -> label -> labeledstatement -> TracePat 
       (statementTyping gamma l0 (labline p (stwhile e S )) (Loop p T1 T2))
 
 with progTyping: environment -> label -> program -> TracePat -> Prop :=
-(*** for this rule, they require that l0 is less/equal p, this is not defined for
-use in locations, only for labels ***)
 
-  | TLab : forall gamma l0 s T p,  (statementTyping gamma l0 (labline p s) T) -> (lablerhslocataion l0 p) ->
+(***
+  for this rule, they require that l0 is less/equal p (where
+  where l0 is a label and
+  p is a location,
+  We use a special relation called label_le_rhslocataion for this.
+***)
+
+  | TLab : forall gamma l0 s T p,  (statementTyping gamma l0 (labline p s) T) -> (label_le_rhslocataion l0 p) ->
       (progTyping gamma l0 (oneLineProg( labline p s)) (Concat (Fetch p) T))
   | TSeq : forall gamma l0 S1 T1 S2 T2, ((progTyping gamma l0 S1 T1) ->
       (progTyping gamma l0 S2 T2) ->
