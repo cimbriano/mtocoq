@@ -47,7 +47,7 @@ Fixpoint TracePRemEpsilon t :=
   end.
 
 
-Definition evttracePat l t:  TracePat :=
+Definition evtTracePat l t:  TracePat :=
   match l with
   | low => t
   | o_high a => Orambank a
@@ -57,7 +57,7 @@ Definition evttracePat l t:  TracePat :=
 Inductive exprTyping: environment -> expression -> labeledType -> TracePat -> Prop :=
   | TVar : forall (gamma:environment) (x:variable) l,
       ((gamma x) = (Some (lnat l))) ->
-      (exprTyping gamma (exvar x) (lnat l) (evttracePat l (Read x)))
+      (exprTyping gamma (exvar x) (lnat l) (evtTracePat l (Read x)))
 
   | TCon : forall (gamma:environment) n, exprTyping gamma (exnum n) (lnat low) Epsilon
 
@@ -70,7 +70,7 @@ Inductive exprTyping: environment -> expression -> labeledType -> TracePat -> Pr
       ((gamma x) =(Some (larr l))) ->
       (exprTyping gamma e (lnat l2) T) ->
       (lable l2 l) ->
-      (exprTyping gamma (exarr x e) (lnat (mtojoin l l2)) (Concat T (evttracePat l (Readarr x)))).
+      (exprTyping gamma (exarr x e) (lnat (mtojoin l l2)) (Concat T (evtTracePat l (Readarr x)))).
 
 
 Inductive select : TracePat -> TracePat -> TracePat -> Prop :=
@@ -81,11 +81,11 @@ Inductive statementTyping: environment -> label -> labeledstatement -> TracePat 
   | TSkip : forall gamma p l, statementTyping gamma l (labline p skip) Epsilon
   | TAsn : forall gamma e l p T x l0 l1, (exprTyping gamma e (lnat l) T) ->
       (gamma x = Some (lnat l1)) -> (lable (mtojoin l0 l) l1) ->
-      (statementTyping gamma l0 (labline p (assign x e)) (Concat T (evttracePat l1 (Write x))))
+      (statementTyping gamma l0 (labline p (assign x e)) (Concat T (evtTracePat l1 (Write x))))
   | TAAsn : forall gamma e1 e2 l1 l2 T1 T2 l0 l x p,
       (exprTyping gamma e1 (lnat l1) T1) -> (exprTyping gamma e2 (lnat l2) T2) ->
       ((gamma x) = Some (larr l)) -> (lable (mtojoin l1 (mtojoin l2 l0)) l) ->
-      (statementTyping gamma l0 (labline p (arrassign x e1 e2)) (Concat T1 (Concat T2 (evttracePat l (Writearr x)))))
+      (statementTyping gamma l0 (labline p (arrassign x e1 e2)) (Concat T1 (Concat T2 (evtTracePat l (Writearr x)))))
   | TCond : forall gamma e l l0 T1 T2 T S1 S2 T3 p,
       (exprTyping gamma e (lnat l) T) ->
       (progTyping gamma (mtojoin l l0) S1 T1) ->
