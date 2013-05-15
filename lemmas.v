@@ -6,6 +6,7 @@ Require Export semantics.
 Require Export typing.
 Require Export Decidable.
 Require Export tactic_notations.
+Require Export strong_induction.
 
 Definition gammavalid (gamma:environment) (M:memory) : Prop :=
 forall x l, ((gamma x = Some (lnat l)) <-> (exists n, (M x = Some (vint n l))))
