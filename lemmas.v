@@ -709,7 +709,7 @@ Inductive curlyless :trace -> trace -> Prop :=
 
 Lemma lemmatwelve : forall gamma l0 S1 S2 T1 T2 M1 M2 M1' M2' t1 t2,
 (progTyping gamma l0 S1 T1) -> (progTyping gamma l0 S2 T2) ->
-(tracePequiv T1 T2) -> (gammavalid gamma M1) -> (gammavalid gamma M2) ->
+(TracePatEquiv T1 T2) -> (gammavalid gamma M1) -> (gammavalid gamma M2) ->
 (progSem M1 S1 t1 M1') -> (progSem M2 S2 t2 M2') ->
 ((lowEquivalentMem M2' M2') /\ (traceequiv t1 t2)).
 Proof. Admitted.

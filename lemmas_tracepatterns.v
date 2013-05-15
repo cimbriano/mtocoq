@@ -36,26 +36,26 @@ Fixpoint ithelement_tp (tp:TracePat) (i:nat) : TracePat:=
 
 
 Lemma lemma_one_tracepat : forall (T1 T2:TracePat),
-  tracePequiv T1 T2 -> (tracepat_len T1) = (tracepat_len T2).
+  TracePatEquiv T1 T2 -> (tracepat_len T1) = (tracepat_len T2).
 Proof.
   intros.
 
   trace_pattern_equiv_cases (induction H) Case;
   try (reflexivity).
 
-  Case "assoc_equiv".
+  Case "Assoc_equiv".
   simpl. rewrite plus_assoc. reflexivity.
 
-  Case "trans_equiv".
-    rewrite <- IHtracePequiv2. apply IHtracePequiv1.
+  Case "Trans_equiv".
+    rewrite <- IHTracePatEquiv2. apply IHTracePatEquiv1.
 
-  Case "epsilon_ident_equivr".
+  Case "Epsilon_ident_equivr".
     simpl. rewrite plus_0_r. reflexivity.
 
-  Case "concat_decomp_equiv".
+  Case "Concat_decomp_equiv".
     simpl.
-    rewrite IHtracePequiv1.
-    rewrite IHtracePequiv2.
+    rewrite IHTracePatEquiv1.
+    rewrite IHTracePatEquiv2.
     reflexivity.
 Qed.
 

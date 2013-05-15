@@ -21,18 +21,18 @@ Inductive TracePat : Type :=
   | TracePplus : TracePat -> TracePat -> TracePat
   | Epsilon    : TracePat.
 
-Inductive tracePequiv: TracePat -> TracePat -> Prop:=
-  | Pepsilon_equiv: tracePequiv Epsilon Epsilon
-  | PO_equiv : forall n, tracePequiv (Orambank n) (Orambank n)
-  | Pread_equiv : forall x, tracePequiv (Read x) (Read x)
-  | Pfetch_equiv: forall p, tracePequiv (Fetch p) (Fetch p)
-  | Passoc_equiv: forall t1 t2 t3, tracePequiv (Concat (Concat t1 t2) t3) (Concat t1 (Concat t2 t3))
-  | Ptrans_equiv: forall t1 t2 t3, (tracePequiv t1 t2) -> (tracePequiv t2 t3) -> (tracePequiv t1 t3)
-  | Pepsilon_ident_equivl: forall T, (tracePequiv T T) -> tracePequiv T (Concat Epsilon T)
-  | Pepsilon_ident_equivr: forall T, (tracePequiv T T) -> tracePequiv T (Concat T Epsilon)
-  | Pconcat_decomp_equiv: forall T11 T21 T12 T22,
-  (tracePequiv T11 T12) -> (tracePequiv T21 T22) ->
-  (tracePequiv (Concat T11 T21) (Concat T12 T22))
+Inductive TracePatEquiv: TracePat -> TracePat -> Prop:=
+  | Epsilon_equiv: TracePatEquiv Epsilon Epsilon
+  | O_equiv : forall n, TracePatEquiv (Orambank n) (Orambank n)
+  | Read_equiv : forall x, TracePatEquiv (Read x) (Read x)
+  | Fetch_equiv: forall p, TracePatEquiv (Fetch p) (Fetch p)
+  | Assoc_equiv: forall t1 t2 t3, TracePatEquiv (Concat (Concat t1 t2) t3) (Concat t1 (Concat t2 t3))
+  | Trans_equiv: forall t1 t2 t3, (TracePatEquiv t1 t2) -> (TracePatEquiv t2 t3) -> (TracePatEquiv t1 t3)
+  | Epsilon_ident_equivl: forall T, (TracePatEquiv T T) -> TracePatEquiv T (Concat Epsilon T)
+  | Epsilon_ident_equivr: forall T, (TracePatEquiv T T) -> TracePatEquiv T (Concat T Epsilon)
+  | Concat_decomp_equiv: forall T11 T21 T12 T22,
+  (TracePatEquiv T11 T12) -> (TracePatEquiv T21 T22) ->
+  (TracePatEquiv (Concat T11 T21) (Concat T12 T22))
   .
 
 Fixpoint TracePRemEpsilon t :=
@@ -101,8 +101,8 @@ Inductive exprTyping: environment -> expression -> labeledType -> TracePat -> Pr
 
 
 Inductive select : TracePat -> TracePat -> TracePat -> Prop :=
-  | equiv : forall t1 t2, (tracePequiv t1 t2) -> (select t1 t2 t1)
-  | inequiv : forall t1 t2, (~(tracePequiv t1 t2)) -> (select t1 t2 (TracePplus t1 t2))
+  | equiv : forall t1 t2, (TracePatEquiv t1 t2) -> (select t1 t2 t1)
+  | inequiv : forall t1 t2, (~(TracePatEquiv t1 t2)) -> (select t1 t2 (TracePplus t1 t2))
 .
 Inductive statementTyping: environment -> label -> labeledstatement -> TracePat -> Prop :=
   | TSkip : forall gamma p l, statementTyping gamma l (labline p skip) Epsilon
@@ -117,7 +117,7 @@ Inductive statementTyping: environment -> label -> labeledstatement -> TracePat 
       (exprTyping gamma e (lnat l) T) ->
       (progTyping gamma (mtojoin l l0) S1 T1) ->
       (progTyping gamma (mtojoin l l0) S2 T2) ->
-      (((mtojoin l l0) <> low) -> (tracePequiv T1 T2)) -> (select T1 T2 T3) ->
+      (((mtojoin l l0) <> low) -> (TracePatEquiv T1 T2)) -> (select T1 T2 T3) ->
       (statementTyping gamma l0 (labline p (stif e S1 S2)) (Concat T T3))
   | TWhile : forall gamma e l l0 T1 T2 S p,
       (exprTyping gamma e (lnat l) T1) ->
