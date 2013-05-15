@@ -1,9 +1,43 @@
-\documentclass[10pt,  twocolumn]{article}
+\documentclass[10pt,  onecolumn]{article}
 \usepackage{enumerate}
 \usepackage{url}
 
+% To use inline teletype command \texttt{}
+\usepackage{courier}
+
 %To use \citeauthor
 \usepackage[numbers]{natbib}
+
+% For using the listings package (to write code)
+\usepackage{listings}
+\usepackage{color}
+
+\lstset{ %
+	backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+	basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+	breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+	breaklines=true,                 % sets automatic line breaking
+	captionpos=b,                    % sets the caption-position to bottom
+	deletekeywords={...},            % if you want to delete keywords from the given language
+	escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+	extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+	frame=single,                    % adds a frame around the code
+	keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+	keywordstyle=\color{blue},       % keyword style
+	language=ML,                 % the language of the code
+	morekeywords={*,...},            % if you want to add more keywords to the set
+	numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+	numbersep=5pt,                   % how far the line-numbers are from the code
+	rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+	showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+	showstringspaces=false,          % underline spaces within strings only
+	showtabs=false,                  % show tabs within strings adding particular underscores
+	stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+	tabsize=2,                       % sets default tabsize to 2 spaces
+	title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+
 
 \begin{document}
 
@@ -38,11 +72,103 @@ In section \emph{SECTION LABEL}, we discuss challenges both technical and not.
 \section{Introduction}
 \label{sec:introduction}
 % Summarizing your motivation and your accomplishments.
-\cite{techreport}
 
 
+\section {Overview}
 % The intermediate sections should contain full details about what you did.
-\section {Approach}
+
+We will begin by giving an overview of the Coq project files and the contents within each.
+It will be assumed that the reader is familiar with the definitions and concepts presented in \emph{Memory Trace Oblivious Program Execution} (MTOPE).
+Then, we will describe in more detail each file's contents with emphasis on definitions which differ substantially from those provided in the paper.
+
+
+\section{ Project Structure }
+
+% Include a section? Sflib, strong induction technique?
+%	\subsection{ External Requirements }
+	
+ 
+% TODO Maybe these shouldn't be subsections, but some form of list instead?
+	\subsection{ Core Definitions }
+	The foundation of our definitions are found in a file called core.v.
+	Here is where we define all structures common to that will be used in downstream definitions.
+	For the most part the definitions here follow one-to-one from those in the paper, however the definition of statement required special handling.
+	
+	Below we reproduce the relevant definitions from the paper and our Coq definitions.
+
+	
+\begin{figure}
+\caption{ MTPOE definitions for Statements and Programs }
+\label{fig:mto_statements}
+Numbers $n \in \textbf{Nat}$\\
+ORAM bank $o \in \textbf{ORAMbank}$\\
+Locations $p ::= n | o$\\
+Statements $ s ::= skip | x := e | x[e] := e | if(e, S, S) | while(e, S)$\\
+Programs $ S ::= p:s | S;S$
+\end{figure}
+
+\begin{figure}
+\caption{ Typing Judgement for statements : while}
+\label{fig:while_judgement}
+\[
+\frac{ \Gamma \vdash e : Nat \; l; T_{1}   \;\;\;\;  \Gamma, l_{0} \vdash S;T_{2}  \;\;\;\;   l \sqcup l_{0} \sqsubseteq L }
+	{ \Gamma, l_{0} \vdash p:\textbf{while}(e,S);\textbf{Loop}(p,T_{1},T_{2}) }
+\]
+\end{figure}	
+
+\begin{figure}
+\caption{Coq definitions for statements, programs and labeled statements}
+\label{fig:coq_statements}
+\begin{lstlisting}		
+Inductive statement : Type :=
+  | skip : statement
+  | assign: variable -> expression -> statement
+  | arrassign: variable -> expression -> expression -> statement
+  | stif: expression -> program -> program -> statement
+  | stwhile: expression -> program -> statement
+
+with labeledstatement : Type :=
+  | labline : location -> statement -> labeledstatement
+
+with program : Type :=
+  | oneLineProg : labeledstatement -> program
+  | progcat : program -> program -> program.
+\end{lstlisting}	
+\end{figure}
+
+
+
+	
+
+Figure \ref{fig:while_judgement} shows the typing rule for a \texttt{while} statement.
+Notice that even though figure \ref{fig:mto_statements} shows the definition of a while statement to be without a location, ie. \texttt{while(e,S)}, the typing judgement for statements types a while statement augmented with a location \texttt{p:while(e,S)}, which is structurally a "Program".
+For this reason, we define \texttt{statement} in Coq to be analogous to the paper's definition, but we introduce a labeled statement.
+\texttt{Program}s is Coq then are not composed of statements, but instead of \texttt{labeledStatements}.
+	
+%	\begin{lstlistings}
+%		
+%	\end{lstlistings}
+
+	\subsubsection { Challenges }
+	
+	\subsection{ Typing Judgements }
+	\subsection{ Operational Semantics }
+	\subsection{ Lemmas and Proofs }
+	
+
+\section{  }
+
+
+\begin{lstlisting}
+
+Inductive expression : Type :=
+  | exvar : variable -> expression
+  | exop : expression -> binop ->\%\\*) expression -> expression
+  | exarr: variable -> expression -> expression
+  | exnum: mtoint -> expression.
+
+
+\end{lstlisting}
 
 \section{Challenges}
 
@@ -75,6 +201,10 @@ In section \emph{SECTION LABEL}, we discuss challenges both technical and not.
 %- Duplication in definitions, lemmas, proofs for traces and trace patterns
 %
 %- Choosing to represent trace equivalence and trace pattern equivalence as Relations instead of functions (because they're only used in a relational way)
+\cite{mtope}
+\cite{sf}
+\cite{techreport}
+
 
 \bibliographystyle{plainnat}
 \bibliography{report}

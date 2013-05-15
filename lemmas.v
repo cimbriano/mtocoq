@@ -6,6 +6,7 @@ Require Export semantics.
 Require Export typing.
 Require Export Decidable.
 Require Export tactic_notations.
+Require Export strong_induction.
 
 Definition gammavalid (gamma:environment) (M:memory) : Prop :=
 forall x l, ((gamma x = Some (lnat l)) <-> (exists n, (M x = Some (vint n l))))
@@ -753,7 +754,7 @@ Inductive curlyless :trace -> trace -> Prop :=
 
 Lemma lemmatwelve : forall gamma l0 S1 S2 T1 T2 M1 M2 M1' M2' t1 t2,
 (progTyping gamma l0 S1 T1) -> (progTyping gamma l0 S2 T2) ->
-(tracePequiv T1 T2) -> (gammavalid gamma M1) -> (gammavalid gamma M2) ->
+(TracePatEquiv T1 T2) -> (gammavalid gamma M1) -> (gammavalid gamma M2) ->
 (progSem M1 S1 t1 M1') -> (progSem M2 S2 t2 M2') ->
 ((traceequiv t1 t2) /\ (lowEquivalentMem M1' M2')).
 Proof. Admitted.

@@ -39,9 +39,9 @@ Tactic Notation "trace_equiv_cases" tactic(first) ident(c) :=
 
 Tactic Notation "trace_pattern_equiv_cases" tactic(first) ident(c) :=
   first;
-  [ Case_aux c "epsilon_equiv" | Case_aux c "O_equiv"
-  | Case_aux c "read_equiv"    | Case_aux c "fetch_equiv"
-  | Case_aux c "assoc_equiv"   | Case_aux c "trans_equiv"
-  | Case_aux c "epsilon_ident_equivl" | Case_aux c "epsilon_ident_equivr"
-  | Case_aux c "concat_decomp_equiv"
+  [ Case_aux c "Epsilon_equiv" | Case_aux c "O_equiv"
+  | Case_aux c "Read_equiv"    | Case_aux c "Fetch_equiv"
+  | Case_aux c "Assoc_equiv"   | Case_aux c "Trans_equiv"
+  | Case_aux c "Epsilon_ident_equivl" | Case_aux c "Epsilon_ident_equivr"
+  | Case_aux c "Concat_decomp_equiv"
   ].
