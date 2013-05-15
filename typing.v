@@ -1,6 +1,10 @@
+
 Require Export Sflib.
+
 Require Export FSets.
+
 Require Export Peano.
+
 Require Export core.
 
 Inductive labeledType : Type :=
@@ -14,7 +18,7 @@ Inductive TracePat : Type :=
   | Write      : variable -> TracePat
   | Readarr    : variable -> TracePat
   | Writearr   : variable -> TracePat
-  | Loop       : location -> TracePat -> TracePat -> TracePat
+  | Loop       : location -> TracePat -> TracePat-> TracePat
   | Fetch      : location -> TracePat
   | Orambank   : orambank -> TracePat
   | Concat     : TracePat -> TracePat -> TracePat
@@ -34,6 +38,8 @@ Inductive tracePequiv: TracePat -> TracePat -> Prop:=
   (tracePequiv T11 T12) -> (tracePequiv T21 T22) ->
   (tracePequiv (Concat T11 T21) (Concat T12 T22))
   .
+
+
 
 Fixpoint TracePRemEpsilon t :=
   match t with
@@ -81,23 +87,16 @@ Definition evttracePat l t:  TracePat :=
   end.
 
 
-Inductive exprTyping: environment -> expression -> labeledType -> TracePat -> Prop :=
-  | TVar : forall (gamma:environment) (x:variable) l,
-      ((gamma x) = (Some (lnat l))) ->
-      (exprTyping gamma (exvar x) (lnat l) (evttracePat l (Read x)))
-
-  | TCon : forall (gamma:environment) n, exprTyping gamma (exnum n) (lnat low) Epsilon
-
-  | TOp : forall (gamma:environment) e1 e2 l1 l2 T1 T2 op,
-      (exprTyping gamma e1 (lnat l1) T1) ->
-      (exprTyping gamma e2 (lnat l2) T2) ->
-      (exprTyping gamma (exop e1 op e2) (lnat (mtojoin l1 l2)) (Concat T1 T2))
-
-  | TArr : forall (gamma:environment) x e l l2 T,
-      ((gamma x) =(Some (larr l))) ->
-      (exprTyping gamma e (lnat l2) T) ->
-      (lable l2 l) ->
-      (exprTyping gamma (exarr x e) (lnat (mtojoin l l2)) (Concat T (evttracePat l (Readarr x)))).
+Inductive exprTyping: environment -> expression ->labeledType -> TracePat ->Prop :=
+|TVar : forall (gamma:environment) (x:variable) l,
+((gamma x) =(Some (lnat l)))  -> (exprTyping gamma (exvar x) (lnat l) (evttracePat l (Read x)))
+|TCon : forall (gamma:environment) n, exprTyping gamma (exnum n) (lnat low) Epsilon
+|TOp : forall (gamma:environment) e1 e2 l1 l2 T1 T2 op,
+(exprTyping gamma e1 (lnat l1) T1) -> (exprTyping gamma e2 (lnat l2) T2) ->
+(exprTyping gamma (exop e1 op e2) (lnat (mtojoin l1 l2)) (Concat T1 T2))
+|TArr : forall (gamma:environment) x e l l2 T, ((gamma x) =(Some (larr l))) ->
+(exprTyping gamma e (lnat l2) T) -> (lable l2 l) ->
+(exprTyping gamma (exarr x e) (lnat (mtojoin l l2)) (Concat T (evttracePat l (Readarr x)))).
 
 
 Inductive select : TracePat -> TracePat -> TracePat -> Prop :=
