@@ -35,17 +35,6 @@ Inductive TracePatEquiv: TracePat -> TracePat -> Prop:=
   (TracePatEquiv (Concat T11 T21) (Concat T12 T22))
   .
 
-Fixpoint TracePRemEpsilon t :=
-  match t with
-  | Concat a b =>
-    match (TracePRemEpsilon a),(TracePRemEpsilon a) with
-    | a, Epsilon => a
-    | Epsilon, a => a
-    | a,b => Concat a b
-    end
-  | a => a
-  end.
-
 
 Definition evtTracePat l t:  TracePat :=
   match l with
