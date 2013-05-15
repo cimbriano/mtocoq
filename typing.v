@@ -39,6 +39,10 @@ Inductive TracePatEquiv: TracePat -> TracePat -> Prop:=
   (TracePatEquiv (Concat T11 T21) (Concat T12 T22))
   .
 
+Lemma TracePatEquiv_sym : forall T1 T2, (TracePatEquiv T1 T2) -> (TracePatEquiv T2 T1).
+Proof.
+Admitted.
+
 Definition evtTracePat l t:  TracePat :=
   match l with
   | low => t

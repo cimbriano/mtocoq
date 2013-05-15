@@ -828,7 +828,7 @@ assert (traceequiv t3 t6 /\ lowEquivalentMem M1' M2').
 apply a with gamma (o_high o) p1 p0 T2 T1 M1 M2.
 assumption.
 assumption.
-apply 
+apply TracePatEquiv_sym.
 apply H11.
 intros HH.
 inversion HH.
@@ -850,6 +850,37 @@ inversion H57.
 assumption.
 inversion H57.
 assumption.
+
+assert (traceequiv t3 t6 /\ lowEquivalentMem M1' M2').
+assert (progTyping gamma (o_high o) p1 T2 -> memTraceObliv gamma p1).
+apply mm with (m:= num_statements p1).
+unfold num_statements in DEFLEN.
+rewrite plus_Sn_m in DEFLEN.
+inversion DEFLEN.
+unfold num_statements.
+apply le_plus_r.
+reflexivity.
+assert (memTraceObliv gamma p1).
+apply H57.
+assumption.
+unfold memTraceObliv in H58.
+apply H58 with M1 M2;
+assumption.
+
+assert (t0 = t5).
+apply combo_six_seven with gamma e l2 T6 M1 M2 n n0; assumption.
+split.
+apply concat_decomp_equiv.
+apply equal_equiv.
+apply concat_decomp_equiv.
+rewrite H58.
+apply equal_equiv.
+inversion H57.
+assumption.
+inversion H57.
+assumption.
+(* beginning while case *)
+
 
 
 
