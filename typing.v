@@ -1,6 +1,10 @@
+
 Require Export Sflib.
+
 Require Export FSets.
+
 Require Export Peano.
+
 Require Export core.
 
 Inductive labeledType : Type :=
@@ -14,7 +18,7 @@ Inductive TracePat : Type :=
   | Write      : variable -> TracePat
   | Readarr    : variable -> TracePat
   | Writearr   : variable -> TracePat
-  | Loop       : location -> TracePat -> TracePat -> TracePat
+  | Loop       : location -> TracePat -> TracePat-> TracePat
   | Fetch      : location -> TracePat
   | Orambank   : orambank -> TracePat
   | Concat     : TracePat -> TracePat -> TracePat
@@ -35,6 +39,9 @@ Inductive TracePatEquiv: TracePat -> TracePat -> Prop:=
   (TracePatEquiv (Concat T11 T21) (Concat T12 T22))
   .
 
+Lemma TracePatEquiv_sym : forall T1 T2, (TracePatEquiv T1 T2) -> (TracePatEquiv T2 T1).
+Proof.
+Admitted.
 
 Definition evtTracePat l t:  TracePat :=
   match l with

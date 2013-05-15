@@ -173,12 +173,56 @@ Qed.
 
 (* Parameter P : nat -> Prop. *)
 
-(* Might be needed for Lemma 3 *)
 Fixpoint numconcat t : nat :=
 match t with 
 |concat a b => S (plus (numconcat a) (numconcat b))
 | _ => O
 end.
+
+Lemma le_S :
+  forall n m : nat,
+    n <= S m -> n <= m \/ n = S m.
+Proof.
+  intros. (* omega solves the goal *)
+  inversion H.
+  right. reflexivity.
+  left. assumption.
+Qed.
+
+Theorem strongind_aux :forall (P : nat -> Prop),
+  P 0 ->
+  (forall n, (forall m, m <= n -> P m) -> P (S n)) ->
+  forall n, (forall m, ((m <= n) -> P m)).
+Proof.
+  induction n as [ | n' IHn' ].
+    intros m H1.
+    inversion H1.
+    assumption.
+    intros.
+    assert (m <= n' \/ m = S n'). apply le_S. assumption.
+    inversion H2.
+    apply IHn'; assumption.
+    rewrite H3.
+    apply (H0 n'); assumption.
+Qed.
+
+Lemma weaken :
+  forall (P : nat -> Prop), (forall (n:nat), (forall m, ((m <= n) -> P m))) -> (forall n, P n).
+Proof.
+  intros P H n.
+  apply (H n n).
+  apply le_n.
+Qed.
+
+Theorem strongind : forall (P : nat -> Prop),
+  P 0 ->
+  (forall n, (forall m, m <= n -> P m) -> P (S n)) ->
+  forall n, P n.
+Proof.
+  intros.
+  apply weaken.
+  apply strongind_aux; assumption.
+Qed.
 
 
 Lemma lemma_plusright : forall a b, a<=a+b.
@@ -712,7 +756,7 @@ Lemma lemmatwelve : forall gamma l0 S1 S2 T1 T2 M1 M2 M1' M2' t1 t2,
 (progTyping gamma l0 S1 T1) -> (progTyping gamma l0 S2 T2) ->
 (TracePatEquiv T1 T2) -> (gammavalid gamma M1) -> (gammavalid gamma M2) ->
 (progSem M1 S1 t1 M1') -> (progSem M2 S2 t2 M2') ->
-((lowEquivalentMem M2' M2') /\ (traceequiv t1 t2)).
+((traceequiv t1 t2) /\ (lowEquivalentMem M1' M2')).
 Proof. Admitted.
 
 Lemma lemmasix : forall gamma e T M1 M2 t1 t2 n1 n2,
@@ -726,6 +770,20 @@ Lemma lemmaseven : forall gamma e l T M1 M2 t1 t2 n1 n2,
 (gammavalid gamma M2) -> (exprSem M1 e t1 n1) ->
 (exprSem M2 e t2 n2) -> (t1 = t2).
 Proof. Admitted.
+
+Lemma combo_six_seven :forall gamma e l T M1 M2 t1 t2 n1 n2,
+(exprTyping gamma e (lnat l) T) -> (gammavalid gamma M1) ->
+(gammavalid gamma M2) -> (exprSem M1 e t1 n1) ->
+(exprSem M2 e t2 n2) -> (t1 = t2).
+Proof.
+intros gamma e l.
+destruct l.
+intros T M1 M2 t1 t2 n1 n2 HH1 HH2 HH3 HH4 HH5.
+assert (t1 = t2 /\ n1 = n2).
+apply lemmasix with gamma e T M1 M2; assumption.
+apply H.
+apply lemmaseven.
+Qed.
 
 
 
