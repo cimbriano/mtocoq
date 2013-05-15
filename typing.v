@@ -47,33 +47,6 @@ Fixpoint TracePRemEpsilon t :=
   end.
 
 
-Fixpoint TracePconcatcount t : nat :=
-  match t with
-  | Concat Epsilon a => (TracePconcatcount a)
-  | Concat a Epsilon => (TracePconcatcount a)
-  | Concat a b => S(plus (TracePconcatcount a) (TracePconcatcount b))
-  | _ => O
-end.
-
-
-(** based on approach to recursion in coq described in
- http://www.di.ens.fr/~zappa/teaching/coq/ecole10/summer/lectures/lec10.pdf **)
-(**
-Fixpoint TracePNormalFormHelp n T :  TracePat :=
-match n,T with
-|O, a => a
-|S n, a => a
-|S (S n), concat a b => match TracePNormalForm  a with
-|concat c d => concat c (TracePNormalForm (concat d b))
-|c => c
-end
-| a => a
-end.
-
-**)
-
-
-
 Definition evttracePat l t:  TracePat :=
   match l with
   | low => t
