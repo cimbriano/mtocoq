@@ -52,9 +52,9 @@ Definition mtojoin l1 l2 : label :=
   end.
 
 (**** NOTICE, excludes requirement that second not be a program location ****)
-Inductive lable : label -> label -> Prop :=
-  | fst_low : forall l, lable low l
-  | snd_high: forall l n, lable l (o_high n).
+Inductive label_le : label -> label -> Prop :=
+  | fst_low : forall l, label_le low l
+  | snd_high: forall l n, label_le l (o_high n).
 
 (**** we cover that case here****)
 Inductive lablerhslocataion : label -> location -> Prop :=

@@ -69,7 +69,7 @@ Inductive exprTyping: environment -> expression -> labeledType -> TracePat -> Pr
   | TArr : forall (gamma:environment) x e l l2 T,
       ((gamma x) =(Some (larr l))) ->
       (exprTyping gamma e (lnat l2) T) ->
-      (lable l2 l) ->
+      (label_le l2 l) ->
       (exprTyping gamma (exarr x e) (lnat (mtojoin l l2)) (Concat T (evtTracePat l (Readarr x)))).
 
 
@@ -80,11 +80,11 @@ Inductive select : TracePat -> TracePat -> TracePat -> Prop :=
 Inductive statementTyping: environment -> label -> labeledstatement -> TracePat -> Prop :=
   | TSkip : forall gamma p l, statementTyping gamma l (labline p skip) Epsilon
   | TAsn : forall gamma e l p T x l0 l1, (exprTyping gamma e (lnat l) T) ->
-      (gamma x = Some (lnat l1)) -> (lable (mtojoin l0 l) l1) ->
+      (gamma x = Some (lnat l1)) -> (label_le (mtojoin l0 l) l1) ->
       (statementTyping gamma l0 (labline p (assign x e)) (Concat T (evtTracePat l1 (Write x))))
   | TAAsn : forall gamma e1 e2 l1 l2 T1 T2 l0 l x p,
       (exprTyping gamma e1 (lnat l1) T1) -> (exprTyping gamma e2 (lnat l2) T2) ->
-      ((gamma x) = Some (larr l)) -> (lable (mtojoin l1 (mtojoin l2 l0)) l) ->
+      ((gamma x) = Some (larr l)) -> (label_le (mtojoin l1 (mtojoin l2 l0)) l) ->
       (statementTyping gamma l0 (labline p (arrassign x e1 e2)) (Concat T1 (Concat T2 (evtTracePat l (Writearr x)))))
   | TCond : forall gamma e l l0 T1 T2 T S1 S2 T3 p,
       (exprTyping gamma e (lnat l) T) ->
@@ -95,7 +95,7 @@ Inductive statementTyping: environment -> label -> labeledstatement -> TracePat 
   | TWhile : forall gamma e l l0 T1 T2 S p,
       (exprTyping gamma e (lnat l) T1) ->
       (progTyping gamma l0 S T2) ->
-      (lable (mtojoin l l0) low) ->
+      (label_le (mtojoin l l0) low) ->
       (statementTyping gamma l0 (labline p (stwhile e S )) (Loop p T1 T2))
 
 with progTyping: environment -> label -> program -> TracePat -> Prop :=
