@@ -1,10 +1,6 @@
-
 Require Export Sflib.
-
 Require Export FSets.
-
 Require Export Peano.
-
 Require Export core.
 
 Inductive labeledType : Type :=
@@ -35,9 +31,8 @@ Inductive TracePatEquiv: TracePat -> TracePat -> Prop:=
   | Epsilon_ident_equivl: forall T, (TracePatEquiv T T) -> TracePatEquiv T (Concat Epsilon T)
   | Epsilon_ident_equivr: forall T, (TracePatEquiv T T) -> TracePatEquiv T (Concat T Epsilon)
   | Concat_decomp_equiv: forall T11 T21 T12 T22,
-  (TracePatEquiv T11 T12) -> (TracePatEquiv T21 T22) ->
-  (TracePatEquiv (Concat T11 T21) (Concat T12 T22))
-  .
+      (TracePatEquiv T11 T12) -> (TracePatEquiv T21 T22) ->
+      (TracePatEquiv (Concat T11 T21) (Concat T12 T22)).
 
 Lemma TracePatEquiv_sym : forall T1 T2, (TracePatEquiv T1 T2) -> (TracePatEquiv T2 T1).
 Proof.
@@ -71,8 +66,8 @@ Inductive exprTyping: environment -> expression -> labeledType -> TracePat -> Pr
 
 Inductive select : TracePat -> TracePat -> TracePat -> Prop :=
   | equiv : forall t1 t2, (TracePatEquiv t1 t2) -> (select t1 t2 t1)
-  | inequiv : forall t1 t2, (~(TracePatEquiv t1 t2)) -> (select t1 t2 (TracePplus t1 t2))
-.
+  | inequiv : forall t1 t2, (~(TracePatEquiv t1 t2)) -> (select t1 t2 (TracePplus t1 t2)).
+
 Inductive statementTyping: environment -> label -> labeledstatement -> TracePat -> Prop :=
   | TSkip : forall gamma p l, statementTyping gamma l (labline p skip) Epsilon
   | TAsn : forall gamma e l p T x l0 l1, (exprTyping gamma e (lnat l) T) ->
@@ -97,9 +92,10 @@ Inductive statementTyping: environment -> label -> labeledstatement -> TracePat 
 with progTyping: environment -> label -> program -> TracePat -> Prop :=
 
 (***
-  for this rule, they require that l0 is less/equal p (where
-  where l0 is a label and
-  p is a location,
+  for this rule, they require that l0 (elle zero, not ten) 
+  is less/equal p (where 
+    l0 is a label and
+    p is a location,
   We use a special relation called label_le_rhslocataion for this.
 ***)
 
