@@ -20,6 +20,12 @@ Proof.
 Admitted.
 **)
 
+Lemma stayvalid : forall gamma M p t M' , (gammavalid gamma M) -> 
+(progSem M p t M') -> (gammavalid gamma M').
+Proof.
+Admitted.
+
+
 Lemma sameExpr_sameStuff : forall M1 e, forall t1 t2 n1 n2,
 (exprSem M1 e t1 n1) -> (exprSem M1 e t2 n2) ->
 (t1 = t2 /\ n1 = n2).
@@ -96,6 +102,8 @@ split;
 reflexivity.
 Qed.
 
+
+
 Lemma sameProg_sameTrace : forall M1 M1' p1 t1 t2,
 (progSem M1 p1 t1 M1') -> (progSem M1 p1 t2 M1') ->
 (t1 = t2).
@@ -153,7 +161,7 @@ inversion H12.
 assert (t3 = t5 /\ n = n0).
 apply sameExpr_sameStuff with M1 e;
 assumption.
-(* gave up for now *)
+(*fuck it*)
 Admitted.
 
 
@@ -304,6 +312,56 @@ inversion H0.
 apply iff_refl.
 Qed.
 
+(*used for the induction on while*)
+Fixpoint tracelen_withepsilon (t:trace) : nat :=
+  match t with
+  | concat t1 t2 => plus (tracelen_withepsilon t1) (tracelen_withepsilon t2)
+  | _ => 1
+  end.
+
+Lemma nonzerolength_prog : forall  p M1 M2 t , (progSem M1 p t M2) -> ( 0 <> tracelen_withepsilon t).
+Proof.
+intros p.
+induction p.
+intros  M1 M2 t.
+destruct l.
+intros H.
+destruct s.
+inversion H.
+intros HH.
+simpl in HH.
+inversion HH.
+inversion H.
+intros HH.
+simpl in HH.
+inversion HH.
+inversion H.
+intros HH.
+simpl in HH.
+inversion HH.
+inversion H.
+intros HH.
+simpl in HH.
+inversion HH.
+inversion H.
+intros HH.
+simpl in HH.
+inversion HH.
+intros t M1 M2.
+intros H.
+inversion H.
+intros HH.
+simpl in HH.
+symmetry in HH.
+apply plus_is_O in HH.
+inversion HH.
+apply IHp1 in H3.
+symmetry in H7.
+apply H3 in H7.
+inversion H7.
+Qed.
+
+
 Lemma lowEquiv_trans : forall M1 M2 M3, (lowEquivalentMem M1 M2) -> 
 (lowEquivalentMem M2 M3) ->
 (lowEquivalentMem M1 M3).
@@ -320,6 +378,225 @@ apply iff_trans with (M2 x = Some (varr v low)).
 apply H1.
 apply H2.
 Qed.
+
+Lemma nonzerolength_expr : forall M e t n, (exprSem M e t n) -> (0<> tracelen_withepsilon t).
+intros M e.
+induction e.
+intros t n.
+intros H.
+inversion H.
+rewrite H3.
+destruct l.
+simpl.
+trivial.
+simpl.
+trivial.
+intros t n H.
+inversion H.
+intros HH.
+simpl in HH.
+symmetry in HH.
+apply plus_is_O in HH.
+inversion HH.
+apply IHe1 in H4.
+symmetry in H9.
+apply H4 in H9.
+inversion H9.
+intros t n H.
+inversion H.
+intros HH.
+simpl in HH.
+symmetry in HH.
+apply plus_is_O in HH.
+inversion HH.
+apply IHe in H2. 
+symmetry in H9.
+apply H2 in H9.
+inversion H9.
+intros t n H.
+inversion H.
+simpl.
+trivial.
+Qed.
+
+
+
+Lemma whilecase :  forall  n p p0 e t1 t2 M1 M1' M2 M2' l T gamma,
+ tracelen_withepsilon t1 = n->
+ tracelen_withepsilon t2 = tracelen_withepsilon t1->
+ (lowEquivalentMem M1 M2) ->
+ (stmtSem M1 (labline p (stwhile e p0)) t1 M1') -> 
+ (stmtSem M2 (labline p (stwhile e p0)) t2 M2') -> 
+ (statementTyping gamma l (labline p (stwhile e p0)) T) -> 
+ (gammavalid gamma M1) ->
+ (gammavalid gamma M2) ->
+ (memTraceObliv gamma p0) ->
+(
+traceequiv t1 t2 /\ lowEquivalentMem M1' M2'
+).
+Proof.
+intros n.
+apply strongind with 
+(P:=(fun n:nat =>forall p p0 e t1 t2 M1 M1' M2 M2' l T gamma,
+ tracelen_withepsilon t1 = n->
+ tracelen_withepsilon t2 = tracelen_withepsilon t1->
+ (lowEquivalentMem M1 M2) ->
+ (stmtSem M1 (labline p (stwhile e p0)) t1 M1') -> 
+ (stmtSem M2 (labline p (stwhile e p0)) t2 M2') -> 
+ (statementTyping gamma l (labline p (stwhile e p0)) T) -> 
+ (gammavalid gamma M1) ->
+ (gammavalid gamma M2) ->
+ (memTraceObliv gamma p0) ->
+(
+traceequiv t1 t2 /\ lowEquivalentMem M1' M2'
+))).
+intros p p0 e t1 t2 M1 M1' M2 M2' l T gamma HH1 HH2 HH3 HH4 HH5 HH6 HH7 HH9.
+inversion HH4.
+rewrite <- H4 in HH1.
+simpl in HH1.
+inversion HH1.
+rewrite <- H1 in HH1.
+simpl in HH1.
+inversion HH1.
+(* for S n instead of n in base case *)
+(**
+rewrite <- H4 in HH1.
+simpl in HH1.
+inversion HH1.
+apply nonzerolength_expr in H3.
+apply plus_is_O in H9.
+inversion H9.
+symmetry in H8.
+apply H3 in H8.
+inversion H8.
+rewrite <- H1 in HH1.
+simpl in HH1.
+inversion HH1.
+symmetry in H7.
+apply nonzerolength_expr in H5.
+apply H5 in H7.
+inversion H7.
+**)
+intros n0.
+intros mm.
+intros p p0 e t1 t2 M1 M1' M2 M2' l T gamma HH1 HH2 HH3 HH4 HH5 HH6 HH7 HH8 HH9.
+
+inversion HH4.
+inversion HH5.
+inversion H7.
+inversion H16.
+assert (t = t3).
+inversion HH6.
+apply combo_six_seven with gamma e l0 T1 M1 M2 n1 n2;assumption.
+
+assert (traceequiv t5 t7 /\ lowEquivalentMem M6 M9).
+unfold memTraceObliv in HH9.
+apply HH9 with M1 M2;assumption.
+inversion H32.
+
+inversion H23.
+inversion H30.
+
+assert (traceequiv t9 t10 /\ lowEquivalentMem M1' M2').
+apply mm with (tracelen_withepsilon t9) p p0 e M6 M9 l T gamma.
+apply le_S_n.
+rewrite <-HH1.
+rewrite <- H4.
+rewrite <- H21.
+simpl.
+apply le_n_S.
+rewrite plus_assoc.
+rewrite <- H37.
+simpl.
+apply le_Sn_le.
+apply le_plus_r.
+reflexivity.
+assert (tracelen_withepsilon t6 = (tracelen_withepsilon t8)).
+
+admit.
+rewrite <- H43 in H47.
+rewrite <- H37 in H47.
+simpl in H47.
+inversion H47.
+reflexivity.
+assumption.
+assumption.
+assumption.
+assumption.
+apply stayvalid with M1 p0 t5.
+assumption.
+assumption.
+apply stayvalid with M2 p0 t7.
+assumption.
+assumption.
+assumption.
+split.
+apply concat_decomp_equiv.
+apply equal_equiv.
+apply concat_decomp_equiv.
+assert (t = t3).
+inversion HH6.
+apply combo_six_seven with gamma e l0 T1 M1 M2 n1 n2;
+assumption.
+rewrite H48.
+apply equal_equiv.
+apply concat_decomp_equiv.
+apply H33.
+apply concat_decomp_equiv.
+apply equal_equiv.
+inversion H47.
+assumption.
+inversion H47.
+assumption.
+assert ( t = t3 /\ n1 = 0).
+inversion HH6.
+destruct l0.
+apply lemmasix with gamma e T1 M1 M2.
+assumption.
+assumption.
+assumption.
+assumption.
+rewrite H13.
+assumption.
+inversion H23.
+inversion H15.
+apply H6 in H17.
+inversion H17.
+
+inversion HH5.
+assert ( t = t0 /\ 0 = n1).
+inversion HH6.
+destruct l0.
+apply lemmasix with gamma e T1 M1' M2.
+assumption.
+rewrite <- H4.
+assumption.
+assumption.
+assumption.
+assumption.
+inversion H23.
+inversion H15.
+symmetry in H17.
+apply H13 in H17.
+inversion H17.
+assert (t = t0).
+inversion HH6.
+apply combo_six_seven with gamma e l0 T1 M1' M2' 0 0.
+assumption.
+rewrite <- H4.
+assumption.
+rewrite <- H11.
+assumption.
+assumption.
+assumption.
+rewrite H13.
+rewrite <- H4.
+rewrite <- H11.
+split.
+apply equal_equiv.
+assumption.
+Qed.
+
 
 Lemma lowEquiv_refl : forall M, (lowEquivalentMem M M).
 Proof.
@@ -339,6 +616,29 @@ match S with
 |(oneLineProg _ ) => 1
 |(progcat S1 S2) => (num_statements S1) + (num_statements S2)
 end.
+
+Lemma atleastone : forall S2, 1<= num_statements S2 .
+Proof.
+intros S2.
+induction S2.
+destruct l.
+destruct s.
+simpl.
+apply le_refl.
+simpl.
+apply le_refl.
+simpl.
+apply le_refl.
+simpl.
+apply le_n_S.
+apply le_O_n.
+apply le_n_S.
+apply le_O_n.
+simpl.
+apply le_plus_trans.
+apply IHS2_1.
+Qed.
+
 
 
 Theorem Theoremone : forall S (gamma:environment) (l:label) (T:TracePat),
@@ -918,41 +1218,126 @@ assumption.
 assumption.
 assumption.
 
-inversion H6.
-inversion H12.
+assert (traceequiv t t0/\ lowEquivalentMem M1' M2').
+apply whilecase  with (tracelen_withepsilon t) p p0 e M1 M2 low T gamma.
+reflexivity.
 admit.
-admit.
-inversion H12.
-admit.
+assumption.
+assumption.
+assumption.
+assumption.
+assumption.
+assumption.
+apply mm with (num_statements p0) low T2.
+apply le_S_n.
+rewrite DEFLEN.
+simpl.
+apply le_refl.
+reflexivity.
+assumption.
+
+split.
+apply concat_decomp_equiv.
+apply equal_equiv.
+inversion H21.
+assumption.
+inversion H21.
+assumption.
+(**
 assert (t3 = t5 /\ n = 0).
-apply lemmasix with gamma e T1 M1 M2' t3 t5 n 0 in H18.
-inversion H18.
-apply H27 in H37.
+apply H17.
+assumption.
+rewrite H35.
+assumption.
 inversion H37.
+apply H28 in H39.
+inversion H39.
+inversion H12.
+assert (t3 = t4 /\ 0 = n).
+apply H17.
+rewrite H26.
 assumption.
 assumption.
-assumption.
-assumption.
-
 inversion H37.
-inversion H28.
-
-inversion H42.
-rewrite H43 in *.
-
-
-
-assert (progTyping gamma low (progcat p0 (oneLineProg (labline p (stwhile e p0))))
- (Concat T2 (Concat (Fetch p) T))).
-
-apply TSeq.
+symmetry in H39.
+apply H35 in H39.
+inversion H39.
+assert (t3 = t4 /\ 0 = 0).
+apply H17.
+rewrite H26.
 assumption.
-apply TLab.
+rewrite H33.
 assumption.
-apply lowlab.
+inversion H35.
+rewrite <- H26.
+rewrite <- H33.
+rewrite H36.
+split.
+apply equal_equiv.
+assumption.
+**)
 
 
-assert (memTraceObliv gamma (progcat p0 (oneLineProg (labline p (stwhile e p0))))).
-apply mm with nn.
+(*program concatenation*)
+intros M1 M2 t1 M1' t2 M2'.
+intros HH1 HH2 HH3 HH4 HH5.
+inversion HH4.
+inversion HH5.
+assert (memTraceObliv gamma S1).
+assert (1 <= num_statements S2).
+apply atleastone.
+simpl in DEFLEN.
+assert ( num_statements S1<=nn).
+apply le_S_n.
+rewrite DEFLEN.
+assert (S (num_statements S1) = num_statements S1 +1).
+omega.
+rewrite H16.
+apply plus_le_compat_l.
+assumption.
 
+apply mm with (num_statements S1) l0 T1.
+assumption.
+reflexivity.
+assumption.
+assert (memTraceObliv gamma S2).
+assert (1 <= num_statements S1).
+apply atleastone.
+simpl in DEFLEN.
+assert ( num_statements S2<=nn).
+apply le_S_n.
+rewrite DEFLEN.
+assert (S (num_statements S2) = 1+ num_statements S2 ).
+omega.
+rewrite H17.
+apply plus_le_compat_r.
+assumption.
 
+apply mm with (num_statements S2) l0 T2.
+assumption.
+reflexivity.
+assumption.
+assert (traceequiv t0 t4 /\ lowEquivalentMem M0 M5).
+unfold memTraceObliv in H15.
+apply H15 with M1 M2; assumption.
+inversion H17.
+assert(gammavalid gamma M0).
+apply stayvalid with M1 S1 t0;
+assumption.
+assert (gammavalid gamma M5).
+apply stayvalid with M2 S1 t4;
+assumption.
+assert (traceequiv t3 t5 /\ lowEquivalentMem M1' M2').
+unfold memTraceObliv in H16.
+apply H16 with M0 M5;
+assumption.
+
+split.
+inversion H17.
+inversion H22.
+apply concat_decomp_equiv.
+apply H23.
+apply H25.
+inversion H22.
+apply H24.
+Qed.
