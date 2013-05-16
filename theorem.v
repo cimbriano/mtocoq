@@ -937,7 +937,6 @@ apply a with gamma e T0 M1 M2 t3 t5 n n0 in H5;
 repeat assumption.
 assert (traceequiv t4 t6 /\ lowEquivalentMem M1' M2' ).
 assert (progTyping gamma low p0 T1 -> memTraceObliv gamma p0).
-(*assert (forall gamma l T, progTyping gamma l p0 T -> memTraceObliv gamma p0).*)
 apply mm with (m:= num_statements p0).
 unfold num_statements in DEFLEN.
 inversion DEFLEN.
@@ -994,7 +993,6 @@ apply a with gamma e T0 M1 M2 t3 t5 n n0 in H5;
 repeat assumption.
 assert (traceequiv t4 t6 /\ lowEquivalentMem M1' M2' ).
 assert (progTyping gamma low p1 T2 -> memTraceObliv gamma p1).
-(*assert (forall gamma l T, progTyping gamma l p0 T -> memTraceObliv gamma p0).*)
 apply mm with (m:= num_statements p1).
 unfold num_statements in DEFLEN.
 inversion DEFLEN.
@@ -1202,40 +1200,6 @@ inversion H21.
 assumption.
 inversion H21.
 assumption.
-(**
-assert (t3 = t5 /\ n = 0).
-apply H17.
-assumption.
-rewrite H35.
-assumption.
-inversion H37.
-apply H28 in H39.
-inversion H39.
-inversion H12.
-assert (t3 = t4 /\ 0 = n).
-apply H17.
-rewrite H26.
-assumption.
-assumption.
-inversion H37.
-symmetry in H39.
-apply H35 in H39.
-inversion H39.
-assert (t3 = t4 /\ 0 = 0).
-apply H17.
-rewrite H26.
-assumption.
-rewrite H33.
-assumption.
-inversion H35.
-rewrite <- H26.
-rewrite <- H33.
-rewrite H36.
-split.
-apply equal_equiv.
-assumption.
-**)
-
 
 (*program concatenation*)
 intros M1 M2 t1 M1' t2 M2'.
