@@ -1,41 +1,13 @@
 Require Export Sflib.
-
 Require Export FSets.
-
 Require Export Peano.
-
 Require Export core.
-
 Require Export semantics.
-
 Require Export typing.
-
 Require Export lemmas.
+Require Export mto_arith.
 
-Require Export Arith.
-
-Fixpoint max n m : nat :=
-  match n, m with
-    | O, _ => m
-    | S n', O => n
-    | S n', S m' => S (max n' m')
-  end.
-
-(* these are well known properties of max, they are theorems in the santdard library,
-but were having trouble *)
-Lemma le_max_l : forall n m, n <= max n m.
-Proof.
-Admitted.
-
-Lemma le_max_r : forall n m, m <= max n m.
-Proof.
-Admitted.
-
-Lemma le_max_or : forall n m, (n = max n m)\/(m = max n m).
-Proof.
-Admitted.
-
-Lemma stayvalid : forall gamma M p t M' , (gammavalid gamma M) -> 
+Lemma stayvalid : forall gamma M p t M' , (gammavalid gamma M) ->
 (progSem M p t M') -> (gammavalid gamma M').
 Proof.
 Admitted.
