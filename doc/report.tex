@@ -331,7 +331,17 @@ o \sim_L o
 \subsection{ Lemmas and Proofs }
 
 When proving theorem one, we found a stond induction prinicple that we included. \cite{strongind}
-This was used twice in our proof. First, when considering the case in which the program is a single if statement, we performed strong induction on the number of statements in the program. In the case of a single while loop, the technical report makes use of induction over the number of times a while loop is executed. This was difficult to formalize in Coq, so we decided to do strong induction on the length of the trace from executing the while loop.
+This was used twice in our proof. 
+First, when considering the case in which the program is a single if statement, we performed strong induction on the number of statements in the program. 
+In the case of a single while loop, the technical report makes use of induction over the number of times a while loop is executed. 
+This was difficult to formalize in Coq, so we decided to do strong induction on the length of the trace from executing the while loop. 
+In hind sight, we could of replace these two a single induction on the length of the trace, instead of worrying about the number of statements in the program.
+After we condier each single line program, we do structural induction on program concatenation.
+
+In proving the theorem, it took some effort to convice Coq of things that seemed basic.  For example, convincing it that changing a high security variable maintains low memory equvalence, or
+
+
+
 
 
 
