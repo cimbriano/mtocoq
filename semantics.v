@@ -4,15 +4,15 @@ Require Export Peano.
 Require Export core.
 
 
-Definition array : Type :=  nat -> option nat.
+Definition mtoarray : Type :=  mtonat -> option mtonat.
 
-Definition mtoarrget (m:array) (n:mtoint) : mtoint :=
+Definition mtoarrget (m:mtoarray) (n:mtonat) : mtonat :=
   match m n with
   | None => O
   | Some a => a
   end.
 
-Definition mtoarrupd (m:array) (n1 n2:mtoint) : array :=
+Definition mtoarrupd (m:mtoarray) (n1 n2:mtonat) : mtoarray :=
   match m n1 with
   | None => m
   | Some a => (
@@ -30,18 +30,18 @@ Definition mtoarrupd (m:array) (n1 n2:mtoint) : array :=
 *)
 
 Inductive labeledValue : Type :=
-  | vint : mtoint -> label -> labeledValue
-  | varr : array -> label -> labeledValue.
+  | vint : mtonat -> label -> labeledValue
+  | varr : mtoarray -> label -> labeledValue.
 
 
 
-Definition memory := variable -> (option labeledValue).
+Definition memory : Type := variable -> (option labeledValue).
 
 Inductive trace : Type :=
-  | read : variable -> mtoint -> trace
-  | readarr : variable ->mtoint -> mtoint -> trace
-  | write : variable -> mtoint -> trace
-  | writearr : variable -> mtoint -> mtoint -> trace
+  | read : variable -> mtonat -> trace
+  | readarr : variable ->mtonat -> mtonat -> trace
+  | write : variable -> mtonat -> trace
+  | writearr : variable -> mtonat -> mtonat -> trace
   | fetch : location -> trace
   | orambank : orambank -> trace
   | concat : trace -> trace ->trace
@@ -60,8 +60,8 @@ Definition memdefine m x v : memory :=
   ).
 
 
-Inductive exprSem: memory -> expression -> trace -> mtoint -> Prop:=
-  | EVar : forall M x t n l, 
+Inductive exprSem: memory -> expression -> trace -> mtonat -> Prop:=
+  | EVar : forall M x t n l,
       (M x = Some (vint n l)) ->
       (t = evttrace l (read x n)) -> 
       (exprSem M (exvar x) t n)
