@@ -11,15 +11,15 @@ Definition varideq x1 x2 : bool :=
 
 Inductive orambank : Type := bank : nat -> orambank.
 
-Definition mtoint : Type := nat.
+Definition mtonat : Type := nat.
 
-Definition binop := mtoint -> mtoint -> mtoint.
+Definition binop := mtonat -> mtonat -> mtonat.
 
 Inductive expression : Type :=
   | exvar : variable -> expression
   | exop : expression ->binop -> expression -> expression
   | exarr: variable -> expression -> expression
-  | exnum: mtoint -> expression.
+  | exnum: mtonat -> expression.
 
 Inductive location : Type :=
   | addr : nat -> location

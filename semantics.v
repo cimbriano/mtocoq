@@ -4,44 +4,45 @@ Require Export Peano.
 Require Export core.
 
 
-Definition array : Type :=  nat -> option nat.
+Definition mtoarray : Type :=  mtonat -> option mtonat.
 
-Definition mtoarrget (m:array) (n:mtoint) : mtoint :=
+Definition mtoarrget (m:mtoarray) (n:mtonat) : mtonat :=
   match m n with
   | None => O
   | Some a => a
   end.
 
-Definition mtoarrupd (m:array) (n1 n2:mtoint) : array :=
+
+Definition mtoarrupd (m:mtoarray) (n1 n2:mtonat) : mtoarray :=
   match m n1 with
   | None => m
   | Some a => (
       fun ind =>
-        if (beq_nat ind n1) 
-        then (Some n2) 
+        if (beq_nat ind n1)
+        then (Some n2)
         else (m ind) )
   end.
 
 
-(* 
+(*
   TODO: Replace two constructors with one that
-  that takes a value * label, where value is 
+  that takes a value * label, where value is
   one of mtoint or array.
 *)
 
 Inductive labeledValue : Type :=
-  | vint : mtoint -> label -> labeledValue
-  | varr : array -> label -> labeledValue.
+  | vint : mtonat -> label -> labeledValue
+  | varr : mtoarray -> label -> labeledValue.
 
 
 
-Definition memory := variable -> (option labeledValue).
+Definition memory : Type := variable -> (option labeledValue).
 
 Inductive trace : Type :=
-  | read : variable -> mtoint -> trace
-  | readarr : variable ->mtoint -> mtoint -> trace
-  | write : variable -> mtoint -> trace
-  | writearr : variable -> mtoint -> mtoint -> trace
+  | read : variable -> mtonat -> trace
+  | readarr : variable ->mtonat -> mtonat -> trace
+  | write : variable -> mtonat -> trace
+  | writearr : variable -> mtonat -> mtonat -> trace
   | fetch : location -> trace
   | orambank : orambank -> trace
   | concat : trace -> trace ->trace
@@ -60,24 +61,24 @@ Definition memdefine m x v : memory :=
   ).
 
 
-Inductive exprSem: memory -> expression -> trace -> mtoint -> Prop:=
-  | EVar : forall M x t n l, 
+Inductive exprSem: memory -> expression -> trace -> mtonat -> Prop:=
+  | EVar : forall M x t n l,
       (M x = Some (vint n l)) ->
-      (t = evttrace l (read x n)) -> 
+      (t = evttrace l (read x n)) ->
       (exprSem M (exvar x) t n)
 
   | EConst : forall M n, (exprSem M (exnum n) epsilon n)
 
   | EOp : forall M e1 e2 t1 t2 n1 n2 n op,
-      (exprSem M e1 t1 n1) -> 
+      (exprSem M e1 t1 n1) ->
       (exprSem M e2 t2 n2) ->
-      (n = op n1 n2) -> 
+      (n = op n1 n2) ->
       (exprSem M (exop e1 op e2) (concat t1 t2) n)
 
-  | EArr : forall M e t n m l n1 t1 x, 
-      (exprSem M e t n) -> 
+  | EArr : forall M e t n m l n1 t1 x,
+      (exprSem M e t n) ->
       (M x = Some (varr m l)) ->
-      (n1 = mtoarrget m n) -> 
+      (n1 = mtoarrget m n) ->
       (t1 = evttrace l (readarr x n n1)) ->
       (exprSem M (exarr x e) (concat t t1) n1).
 
@@ -155,7 +156,7 @@ Inductive traceequiv: trace -> trace -> Prop:=
   | epsilon_ident_equivr: forall T,
       (traceequiv T T) -> traceequiv T (concat T epsilon)
 
-  | concat_decomp_equiv: forall T11 T21 T12 T22, 
+  | concat_decomp_equiv: forall T11 T21 T12 T22,
       (traceequiv T11 T12) ->
       (traceequiv T21 T22) ->
       (traceequiv (concat T11 T21) (concat T12 T22)).

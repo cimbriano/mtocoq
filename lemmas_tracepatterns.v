@@ -18,9 +18,9 @@ Fixpoint tracepat_len (tp : TracePat) : nat :=
 Fixpoint ithelement_tp (tp:TracePat) (i:nat) : TracePat:=
   match i with
   | O   => Epsilon
-  | S O => 
+  | S O =>
       match tp with
-      | Concat tp1 tp2 => 
+      | Concat tp1 tp2 =>
          match tp1 with
          | Epsilon => ithelement_tp tp2 i
          | _ => ithelement_tp tp1 i
@@ -28,7 +28,7 @@ Fixpoint ithelement_tp (tp:TracePat) (i:nat) : TracePat:=
       | Epsilon        => Epsilon
       |              _ => tp
       end
-  | S (S n) => 
+  | S (S n) =>
       match tp with
       | Concat tp1 tp2 => Epsilon
       | _ => Epsilon
@@ -124,27 +124,27 @@ Proof.
   generalize Heqn.
   generalize T i.
   apply strongind with
-      (P:=(fun n => 
-      forall t0 i0, 
-        n=tracepat_len t0 -> 
+      (P:=(fun n =>
+      forall t0 i0,
+        n=tracepat_len t0 ->
         (ithelement_tp t0 i0 <> Epsilon <-> 1 <= i0 <= n))).
   intros t0 i0.
   intros FOO.
-  
+
   split.
-  
+
   Case "->".
     intros HFOO.
     remember lemma_two_1_tracepat.
     symmetry in Heqn.
-    
+
     assert (ithelement_tp t0 i0 = Epsilon).
        apply e. symmetry.
        apply FOO.
-    
+
     rewrite H in HFOO.
     unfold not in HFOO.
-    assert (Epsilon = Epsilon). 
+    assert (Epsilon = Epsilon).
     reflexivity.
     apply HFOO in H0.
     inversion H0.
@@ -154,8 +154,12 @@ Proof.
     generalize H1 H2.
     apply le_trans.
     inversion H0.
+    (* TracePat Proof Complete up to here *)
 
-(* TracePat Proof Complete up to here *)
+Admitted.
+
+(* Copied over trace lemma_two stuff *)
+(*
   Case "<-".
   intros n0.
   intros Hyp.
@@ -174,7 +178,7 @@ Proof.
     assert(forall t0 n0, ((S O) = tracepat_len t0) ->(ithelement_tp t0 (S (S n0)) = Epsilon)).
       intros t0 n0.
       intros HHHH.
-      
+
       trace_pattern_cases
 
       induction t0.
@@ -295,31 +299,14 @@ inversion HHHH.
 apply H1.
 symmetry.
 apply H.
+*)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(* End Trace lemma two stuff *)
+(*
 
 Lemma lemma_five : forall (tp1 tp2 : TracePat),
-  tracePequiv tp1 tp2 <-> 
+  TracePatEquiv tp1 tp2 <->
   forall (i:nat),
     (ithelement_tp tp1 i) = (ithelement_tp tp2 i).
+*)

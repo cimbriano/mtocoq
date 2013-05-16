@@ -2,6 +2,12 @@
 \usepackage{enumerate}
 \usepackage{url}
 
+% Fixes issues with older encoding type that doesn't display < and > correctly.
+\usepackage[T1]{fontenc}
+
+% To put a border around figures
+\usepackage{ mdframed }
+
 % To use inline teletype command \texttt{}
 \usepackage{courier}
 
@@ -99,12 +105,16 @@ Then, we will describe in more detail each file's contents with emphasis on defi
 
 \begin{figure}
 \caption{ MTPOE definitions for Statements and Programs }
-\label{fig:mto_statements}
-Numbers $n \in \textbf{Nat}$\\
-ORAM bank $o \in \textbf{ORAMbank}$\\
-Locations $p ::= n | o$\\
-Statements $ s ::= skip | x := e | x[e] := e | if(e, S, S) | while(e, S)$\\
-Programs $ S ::= p:s | S;S$
+\label{fig:mto_rule_while}
+
+	\begin{mdframed}
+	Numbers $n \in \textbf{Nat}$\\
+	ORAM bank $o \in \textbf{ORAMbank}$\\
+	Locations $p ::= n | o$\\
+	Statements $ s ::= skip | x := e | x[e] := e | if(e, S, S) | while(e, S)$\\
+	Programs $ S ::= p:s | S;S$
+	\end{mdframed}
+
 \end{figure}
 
 \begin{figure}
@@ -138,41 +148,185 @@ with program : Type :=
 
 
 
-
-
 Figure \ref{fig:while_judgement} shows the typing rule for a \texttt{while} statement.
-Notice that even though figure \ref{fig:mto_statements} shows the definition of a while statement to be without a location, ie. \texttt{while(e,S)}, the typing judgement for statements types a while statement augmented with a location \texttt{p:while(e,S)}, which is structurally a "Program".
+Notice that even though figure \ref{fig:mto_rule_while} shows the definition of a while statement to be without a location, ie. \texttt{while(e,S)}, the typing judgement for statements types a while statement augmented with a location \texttt{p:while(e,S)}, which is structurally a "Program".
 The typing rule requires this information since the type of trace pattern produced depends on a while statements label.
 For this reason, we define \texttt{statement} in Coq to be analogous to the paper's definition, but we introduce a labeled statement.
 Doing this further requires writing the typing rules in terms of labeled statements, rather than plain statements as is done by the paper.
 
+Another deviation from the paper's definitions is in the implementation of the operator $\sqsubseteq$.
+In all but one case, this operator compares two security labels, each of which can be either $L$ or an Oram Bank number - definition shown in figure \ref{fig:mto_labeldef}.
+However, in the typing rule for, what the paper refers to as, a labeled statement one of the premises abuses the $\sqsubseteq$ operator by comparing a label, $l_{0}$ to a location. The rule is shown in figure \ref{fig:mto_rule_statement}
 
-%	\begin{lstlistings}
-%
-%	\end{lstlistings}
+\begin{figure}
+\caption{Formal definition for Labels}
+\label{fig:mto_labeldef}
+	\begin{mdframed}
+	Labels $l \in \textbf{SecLabels} = \{L\} \cup \textbf{ORAMbanks}$
+	\end{mdframed}
+\end{figure}
 
-	\subsubsection { Challenges }
+\begin{figure}
+\caption{ Typing rule for labeled statements under the judgment for Programs}
+\label{fig:mto_rule_statement}
+\[
+\frac{ \Gamma, l_{0} \vdash s;T \;\;\; l_{0} \sqsubseteq p }
+	{ \Gamma, l_{0} \vdash p:s;(\textbf{Fetch} p)@T}
+\]
+\end{figure}
 
-	\subsection{ Typing Judgements }
-	\subsection{ Operational Semantics }
-	\subsection{ Lemmas and Proofs }
-
-
-\section{  }
-
-
+\begin{figure}
+\caption{ Coq definition of the $\sqsubseteq$ operator }
+\label{fig:coq_label_le}
 \begin{lstlisting}
+Inductive label_le : label -> label -> Prop :=
+  | fst_low : forall   l, label_le low l
+  | snd_high: forall l n, label_le l   (o_high n).
 
-Inductive expression : Type :=
-  | exvar : variable -> expression
-  | exop : expression -> binop ->\%\\*) expression -> expression
-  | exarr: variable -> expression -> expression
-  | exnum: mtoint -> expression.
-
-
+Inductive label_le_rhslocation : label -> location -> Prop :=
+  | highloc : forall l n, label_le_rhslocation l   (oram n)
+  | lowlab  : forall   p, label_le_rhslocation low p.
 \end{lstlisting}
 
-\section{Challenges}
+\end{figure}
+
+Figure \ref{fig:coq_label_le} shows our proposed implementation of this operator.
+We essentially have two versions of the $\sqsubseteq$ relation, one which is the expected operation of comparing two security labels, and the other of which compares a label to a location.
+
+
+
+
+\subsection{ Typing and Semantics }
+
+The definitions and structures required for typing and semantics are located in Coq file named \texttt{typing.v} and \texttt{semantics.v}.
+We'll omit discussion of the mostly straightforward parts of these two sections and focus on clarifying naming conventions and describing implementation difficulties or judgement calls.
+
+% Naming convention - labeled types and labeled values
+The basic types for values in this type system are $Nat$ and $Array$.
+However, since the goal of this work is to maintain the security of sensitive data, the values types are augmented with security labels as discussed in the previous section.
+The paper uses the term Types to refer to one of $Nat$ or $Array$ augmented with a security label, whereas our implementation uses the terms \texttt{labeledType} and \texttt{labeledValue} as shown in figure \ref{fig:coq_labeled_things}.
+
+\begin{figure}
+\caption{Plain basic type sand augmented with security labels}
+\label{fig:coq_labeled_things}
+
+\begin{lstlisting}
+Definition mtonat   : Type := nat.
+Definition mtoarray : Type := mtonat -> option mtonat.
+
+Inductive labeledValue: Type :=
+  | vint : mtonat   -> label -> labeledValue
+  | varr : mtoarray -> label -> labeledValue.
+
+Inductive labeledType : Type :=
+  | larr : label -> labeledType
+  | lnat : label -> labeledType.
+\end{lstlisting}
+\end{figure}
+
+
+
+% Memory and Gamma are total functions
+Both the typing definitions and semantics definitions require a mapping from variables to some value.
+In typing this map is called $\Gamma$, or the typing environment,  which maps variables to types.
+In semantics this is a representation of memory, $M$, which maps variables to values which can have type $Array \; l$ or $Nat \; l$, where $l$ is a security label.
+In the paper, these maps are treated as partial-functions that are defined for some finite domain and undefined all inputs outside that domain.
+In Coq however, we're forced to define total functions and we do so by returning an option type as shown in figure \ref{fig:coq_total_functions}.
+
+
+\begin{figure}
+\caption{ Coq definitions for environment and memory }
+\label{fig:coq_total_functions}
+\begin{lstlisting}
+Definition environment : Type := variable -> (option labeledType).
+Definition      memory : Type := variable -> (option labeledValue).
+\end{lstlisting}
+\end{figure}
+
+
+
+% Judgement call - Mutable arrays as functions that get updated
+The semantic rules for array assignment necessitate the modeling of mutable arrays.
+Since Coq is a functional language, our arrays are implemented as functions which take an index and return a value - either the value at the index if it is in bounds, or zero if the index is out of bounds.
+In order to support mutability, updates to an array are implemented as a wrapping function around an existing array.
+When the array, or equivalently the wrapping function, is applied to an index, if that index matches that given to the wrapping function as part of the update, then the application is "caught" at the wrapping function and a value is returned immediately.
+Otherwise, if the index is not that related to the last update, the wrapping function passes along the index to the last wrapped array.
+Figure \ref{fig:coq_arrays} shows this implementation.
+It should be noted, that part of the assumptions of the paper is that all variables exist in memory and in the typing environment 
+
+\begin{figure}
+\caption{ Coq implementation of array get and update}
+\label{fig:coq_arrays}
+
+\begin{lstlisting}
+Definition mtoarrget (m:mtoarray) (n:mtonat) : mtonat :=
+  match m n with
+  | None => O
+  | Some a => a
+  end.
+
+Definition mtoarrupd (m:mtoarray) (n1 n2:mtonat) : mtoarray :=
+  match m n1 with
+  | None => m
+  | Some a =>
+      fun ind =>
+        if   (beq_nat ind n1)
+        then (Some n2)
+        else (m ind)
+  end.
+\end{lstlisting}
+
+\end{figure}
+
+% Choosing to represent trace equivalence and trace pattern equivalence as Relations instead of functions (because they're only used in a relational way)
+
+One aspect of implementation in which we initially went in the wrong direction was in our approach to Trace Pattern equivalence.
+Our initial idea was to try to write a function which given two Trace Patterns would return a boolean if the two were equivalent according to the rules shown in figure \ref{fig:mto_TracePat_equiv}.
+However, since Trace Pattern equivalence is a proposition, (Prop type in Coq), we were attempting to produce a function from Prop to boolean, which 
+
+
+\begin{figure}
+\caption{Trace Pattern Equivalence rules}
+\label{fig:mto_TracePat_equiv}
+\[
+\frac {T ~_L T}
+        {\epsilon @T  \sim_{L}T@\epsilon  \sim_{L} T}
+\]
+\[
+\epsilon \sim_{L}  \epsilon
+\]
+\[
+\frac {T_1 \sim_L T_2 \;\;\; T_2 \sim_L T_3}
+        {T_1 \sim_L T_3}
+\]
+\[
+\frac {T_1 \sim_L T'_1 \;\;\; T_2 \sim_L T'_2}
+        {T_1@T_2 \sim_L T'_1@T'_2}
+\]
+\[
+(T_1@T_2)@T_3 \sim_L T_1@(T_2@T_3)
+\]
+\[
+o \sim_L o
+\]
+\[
+\textbf{Fetch}\;p \sim_L \textbf{Fetch}\;p
+\]
+\[
+\textbf{Read}\;x \sim_L \textbf{Read}\;x
+\]
+
+
+\end{figure}
+
+
+
+
+
+
+
+
+\subsection{ Lemmas and Proofs }
 
 % Proofs were written by humans for humans.
 % Many times there we're "abuses of notation", "lemma 5 is proved using a similar technique as lemma 4"
@@ -180,8 +334,6 @@ Inductive expression : Type :=
 
 
 %- Duplication in definitions, lemmas, proofs for traces and trace patterns
-%
-%- Choosing to represent trace equivalence and trace pattern equivalence as Relations instead of functions (because they're only used in a relational way)
 %
 %- Handling of arrays
 %	* Will this constrain extending the type system to allow each element of an array to occupy its own OramBank?
@@ -203,8 +355,8 @@ Inductive expression : Type :=
 %- Duplication in definitions, lemmas, proofs for traces and trace patterns
 %
 %- Choosing to represent trace equivalence and trace pattern equivalence as Relations instead of functions (because they're only used in a relational way)
-\cite{mtope}
 \cite{sf}
+\cite{mtope}
 \cite{techreport}
 
 

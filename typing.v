@@ -14,7 +14,7 @@ Inductive TracePat : Type :=
   | Write      : variable -> TracePat
   | Readarr    : variable -> TracePat
   | Writearr   : variable -> TracePat
-  | Loop       : location -> TracePat -> TracePat-> TracePat
+  | Loop       : location -> TracePat -> TracePat -> TracePat
   | Fetch      : location -> TracePat
   | Orambank   : orambank -> TracePat
   | Concat     : TracePat -> TracePat -> TracePat
