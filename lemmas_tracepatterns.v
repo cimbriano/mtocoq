@@ -154,8 +154,12 @@ Proof.
     generalize H1 H2.
     apply le_trans.
     inversion H0.
+    (* TracePat Proof Complete up to here *)
 
-(* TracePat Proof Complete up to here *)
+Admitted.
+
+(* Copied over trace lemma_two stuff *)
+(*
   Case "<-".
   intros n0.
   intros Hyp.
@@ -174,7 +178,7 @@ Proof.
     assert(forall t0 n0, ((S O) = tracepat_len t0) ->(ithelement_tp t0 (S (S n0)) = Epsilon)).
       intros t0 n0.
       intros HHHH.
-      
+
       trace_pattern_cases
 
       induction t0.
@@ -295,31 +299,14 @@ inversion HHHH.
 apply H1.
 symmetry.
 apply H.
+*)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(* End Trace lemma two stuff *)
+(*
 
 Lemma lemma_five : forall (tp1 tp2 : TracePat),
-  tracePequiv tp1 tp2 <-> 
+  TracePatEquiv tp1 tp2 <->
   forall (i:nat),
     (ithelement_tp tp1 i) = (ithelement_tp tp2 i).
+*)

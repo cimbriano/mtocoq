@@ -345,6 +345,10 @@ Theorem Theoremone : forall S (gamma:environment) (l:label) (T:TracePat),
 ((progTyping gamma l S T) ->
 (memTraceObliv gamma S)).
 Proof.
+	Admitted.
+
+(*
+Proof.
 intros S.
 remember (num_statements S).
 generalize Heqn.
@@ -955,4 +959,4 @@ apply lowlab.
 assert (memTraceObliv gamma (progcat p0 (oneLineProg (labline p (stwhile e p0))))).
 apply mm with nn.
 
-
+*)
