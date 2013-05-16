@@ -278,10 +278,46 @@ Definition mtoarrupd (m:mtoarray) (n1 n2:mtonat) : mtoarray :=
 
 \end{figure}
 
+% Choosing to represent trace equivalence and trace pattern equivalence as Relations instead of functions (because they're only used in a relational way)
+
+One aspect of implementation in which we initially went in the wrong direction was in our approach to Trace Pattern equivalence.
+Our initial idea was to try to write a function which given two Trace Patterns would return a boolean if the two were equivalent according to the rules shown in figure \ref{fig:mto_TracePat_equiv}.
+However, since Trace Pattern equivalence is a proposition, (Prop type in Coq), we were attempting to produce a function from Prop to boolean, which 
 
 
+\begin{figure}
+\caption{Trace Pattern Equivalence rules}
+\label{fig:mto_TracePat_equiv}
+\[
+\frac {T ~_L T}
+        {\epsilon @T  \sim_{L}T@\epsilon  \sim_{L} T}
+\]
+\[
+\epsilon \sim_{L}  \epsilon
+\]
+\[
+\frac {T_1 \sim_L T_2 \;\;\; T_2 \sim_L T_3}
+        {T_1 \sim_L T_3}
+\]
+\[
+\frac {T_1 \sim_L T'_1 \;\;\; T_2 \sim_L T'_2}
+        {T_1@T_2 \sim_L T'_1@T'_2}
+\]
+\[
+(T_1@T_2)@T_3 \sim_L T_1@(T_2@T_3)
+\]
+\[
+o \sim_L o
+\]
+\[
+\textbf{Fetch}\;p \sim_L \textbf{Fetch}\;p
+\]
+\[
+\textbf{Read}\;x \sim_L \textbf{Read}\;x
+\]
 
 
+\end{figure}
 
 
 
@@ -298,8 +334,6 @@ Definition mtoarrupd (m:mtoarray) (n1 n2:mtonat) : mtoarray :=
 
 
 %- Duplication in definitions, lemmas, proofs for traces and trace patterns
-%
-%- Choosing to represent trace equivalence and trace pattern equivalence as Relations instead of functions (because they're only used in a relational way)
 %
 %- Handling of arrays
 %	* Will this constrain extending the type system to allow each element of an array to occupy its own OramBank?
@@ -321,8 +355,8 @@ Definition mtoarrupd (m:mtoarray) (n1 n2:mtonat) : mtoarray :=
 %- Duplication in definitions, lemmas, proofs for traces and trace patterns
 %
 %- Choosing to represent trace equivalence and trace pattern equivalence as Relations instead of functions (because they're only used in a relational way)
-\cite{mtope}
 \cite{sf}
+\cite{mtope}
 \cite{techreport}
 
 
