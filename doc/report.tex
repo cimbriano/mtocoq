@@ -190,13 +190,93 @@ Inductive label_le_rhslocation : label -> location -> Prop :=
 
 \end{figure}
 
-Figure \ref{coq_label_le} shows our proposed implementation of this operator.
+Figure \ref{fig:coq_label_le} shows our proposed implementation of this operator.
 We essentially have two versions of the $\sqsubseteq$ relation, one which is the expected operation of comparing two security labels, and the other of which compares a label to a location.
 
 
 
 
-\subsection{ Typing Judgements }
+\subsection{ Typing and Semantics }
+
+The definitions and structures required for typing and semantics are located in Coq file named \texttt{typing.v} and \texttt{semantics.v}.
+We'll omit discussion of the mostly straightforward parts of these two sections and focus on clarifying naming conventions and describing implementation difficulties or judgement calls.
+
+% Naming convention - labeled types and labeled values
+The basic types for values in this type system are $Nat$ and $Array$.
+However, since the goal of this work is to maintain the security of sensitive data, the values types are augmented with security labels as discussed in the previous section.
+The paper uses the term Types to refer to one of $Nat$ or $Array$ augmented with a security label, whereas our implementation uses the terms \texttt{labeledType} and \texttt{labeledValue} as shown in figure \ref{fig:coq_labeled_things}.
+
+\begin{figure}
+\caption{Plain basic type sand augmented with security labels}
+\label{fig:coq_labeled_things}
+
+\begin{lstlisting}
+Definition mtonat   : Type := nat.
+Definition mtoarray : Type := mtonat -> option mtonat.
+
+Inductive labeledValue: Type :=
+  | vint : mtonat   -> label -> labeledValue
+  | varr : mtoarray -> label -> labeledValue.
+
+Inductive labeledType : Type :=
+  | larr : label -> labeledType
+  | lnat : label -> labeledType.
+\end{lstlisting}
+\end{figure}
+
+
+
+% Memory and Gamma are total functions
+Both the typing definitions and semantics definitions require a mapping from variables to some value.
+In typing this map is called $\Gamma$, or the typing environment,  which maps variables to types.
+In semantics this is a representation of memory, $M$, which maps variables to values which can have type $Array \; l$ or $Nat \; l$, where $l$ is a security label.
+In the paper, these maps are treated as partial-functions that are defined for some finite domain and undefined all inputs outside that domain.
+In Coq however, we're forced to define total functions and we do so by returning an option type as shown in figure \ref{fig:coq_total_functions}.
+
+
+\begin{figure}
+\caption{ Coq definitions for environment and memory }
+\label{fig:coq_total_functions}
+\begin{lstlisting}
+Definition environment : Type := variable -> (option labeledType).
+Definition      memory : Type := variable -> (option labeledValue).
+\end{lstlisting}
+\end{figure}
+
+
+
+% Judgement call - Mutable arrays as functions that get updated
+The semantic rules for array assignment necessitate the modeling of mutable arrays.
+Since Coq is a functional language, our arrays are implemented as functions which take an index and return a value - either the value at the index if it is in bounds, or zero if the index is out of bounds.
+In order to support mutability, updates to an array are implemented as a wrapping function around an existing array.
+When the array, or equivalently the wrapping function, is applied to an index, if that index matches that given to the wrapping function as part of the update, then the application is "caught" at the wrapping function and a value is returned immediately.
+Otherwise, if the index is not that related to the last update, the wrapping function passes along the index to the last wrapped array.
+Figure \ref{fig:coq_arrays} shows this implementation.
+It should be noted, that part of the assumptions of the paper is that all variables exist in memory and in the typing environment 
+
+\begin{figure}
+\caption{ Coq implementation of array get and update}
+\label{fig:coq_arrays}
+
+\begin{lstlisting}
+Definition mtoarrget (m:mtoarray) (n:mtonat) : mtonat :=
+  match m n with
+  | None => O
+  | Some a => a
+  end.
+
+Definition mtoarrupd (m:mtoarray) (n1 n2:mtonat) : mtoarray :=
+  match m n1 with
+  | None => m
+  | Some a =>
+      fun ind =>
+        if   (beq_nat ind n1)
+        then (Some n2)
+        else (m ind)
+  end.
+\end{lstlisting}
+
+\end{figure}
 
 
 
@@ -209,8 +289,8 @@ We essentially have two versions of the $\sqsubseteq$ relation, one which is the
 
 
 
-	\subsection{ Operational Semantics }
-	\subsection{ Lemmas and Proofs }
+
+\subsection{ Lemmas and Proofs }
 
 % Proofs were written by humans for humans.
 % Many times there we're "abuses of notation", "lemma 5 is proved using a similar technique as lemma 4"
