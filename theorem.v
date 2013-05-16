@@ -14,7 +14,7 @@ Require Export lemmas.
 
 (**
 Lemma labelequal_int : forall M1 M2 x l1 l2 n1 n2, (lowEquivalentMem M1 M2) ->
-(M1 x = Some (vint n1 l1)) -> (M2 x = Some (vint n2 l2)) -> 
+(M1 x = Some (vint n1 l1)) -> (M2 x = Some (vint n2 l2)) ->
 (l1 = l2).
 Proof.
 Admitted.
@@ -193,7 +193,7 @@ apply iff_sym.
 apply H.
 Qed.
 
-Lemma lowEquiv_persist_high_int : forall M1 x v o, 
+Lemma lowEquiv_persist_high_int : forall M1 x v o,
 (exists v1, M1 x = Some (vint v1 (o_high o))) ->
 (lowEquivalentMem (memdefine M1 x (vint v (o_high o))) M1).
 Proof.
@@ -249,7 +249,7 @@ apply iff_refl.
 Qed.
 
 
-Lemma lowEquiv_persist_high_arr : forall M1 x v o, 
+Lemma lowEquiv_persist_high_arr : forall M1 x v o,
 (exists v1, M1 x = Some (varr v1 (o_high o))) ->
 (lowEquivalentMem (memdefine M1 x (varr v (o_high o))) M1).
 Proof.
@@ -304,7 +304,7 @@ inversion H0.
 apply iff_refl.
 Qed.
 
-Lemma lowEquiv_trans : forall M1 M2 M3, (lowEquivalentMem M1 M2) -> 
+Lemma lowEquiv_trans : forall M1 M2 M3, (lowEquivalentMem M1 M2) ->
 (lowEquivalentMem M2 M3) ->
 (lowEquivalentMem M1 M3).
 Proof.
@@ -342,14 +342,14 @@ end.
 
 
 Theorem Theoremone : forall S (gamma:environment) (l:label) (T:TracePat),
-((progTyping gamma l S T) -> 
+((progTyping gamma l S T) ->
 (memTraceObliv gamma S)).
 Proof.
 intros S.
 remember (num_statements S).
 generalize Heqn.
 generalize S.
-apply strongind with 
+apply strongind with
 (P:=(fun n => forall S, n=num_statements S -> (
 forall gamma l T, progTyping gamma l S T -> memTraceObliv gamma S
 ))).
@@ -395,7 +395,7 @@ apply HH1.
 (*assign case*)
 intros M1 M2 t1 M1' t2 M2'.
 intros HH1 HH2 HH3 HH4 HH5.
-inversion HH1. 
+inversion HH1.
 inversion HH4.
 inversion H8.
 inversion HH5.
@@ -496,7 +496,7 @@ apply H30.
 (*array assign case*)
 intros M1 M2 t1 M1' t2 M2'.
 intros HH1 HH2 HH3 HH4 HH5.
-inversion HH1. 
+inversion HH1.
 inversion HH4.
 inversion H8.
 inversion HH5.
@@ -692,7 +692,7 @@ apply H47 with M1 M2 ;
 assumption.
 inversion H46.
 split.
-inversion H45. 
+inversion H45.
 rewrite H49.
 apply concat_decomp_equiv.
 apply equal_equiv.
@@ -749,7 +749,7 @@ apply H47 with M1 M2 ;
 assumption.
 inversion H46.
 split.
-inversion H45. 
+inversion H45.
 rewrite H49.
 apply concat_decomp_equiv.
 apply equal_equiv.

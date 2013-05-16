@@ -18,9 +18,9 @@ Fixpoint tracepat_len (tp : TracePat) : nat :=
 Fixpoint ithelement_tp (tp:TracePat) (i:nat) : TracePat:=
   match i with
   | O   => Epsilon
-  | S O => 
+  | S O =>
       match tp with
-      | Concat tp1 tp2 => 
+      | Concat tp1 tp2 =>
          match tp1 with
          | Epsilon => ithelement_tp tp2 i
          | _ => ithelement_tp tp1 i
@@ -28,7 +28,7 @@ Fixpoint ithelement_tp (tp:TracePat) (i:nat) : TracePat:=
       | Epsilon        => Epsilon
       |              _ => tp
       end
-  | S (S n) => 
+  | S (S n) =>
       match tp with
       | Concat tp1 tp2 => Epsilon
       | _ => Epsilon
@@ -124,27 +124,27 @@ Proof.
   generalize Heqn.
   generalize T i.
   apply strongind with
-      (P:=(fun n => 
-      forall t0 i0, 
-        n=tracepat_len t0 -> 
+      (P:=(fun n =>
+      forall t0 i0,
+        n=tracepat_len t0 ->
         (ithelement_tp t0 i0 <> Epsilon <-> 1 <= i0 <= n))).
   intros t0 i0.
   intros FOO.
-  
+
   split.
-  
+
   Case "->".
     intros HFOO.
     remember lemma_two_1_tracepat.
     symmetry in Heqn.
-    
+
     assert (ithelement_tp t0 i0 = Epsilon).
        apply e. symmetry.
        apply FOO.
-    
+
     rewrite H in HFOO.
     unfold not in HFOO.
-    assert (Epsilon = Epsilon). 
+    assert (Epsilon = Epsilon).
     reflexivity.
     apply HFOO in H0.
     inversion H0.
