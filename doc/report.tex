@@ -65,13 +65,14 @@ In a traditional security model, known as non-interference, a program's inputs a
 The non-interference model seeks to maintain the secrecy of \emph{high} variables by ensuring that all program executions with identical \emph{low} (public) inputs produce the same \emph{low} outputs.
 
 While non-interference is a strong security model in theory, in practice real executing programs "leak" information about its data through a number of channels - timing, electromagnetic radiation, power consumption, and execution trace, to name a few.
-\citeauthor{mtope} presented a type system to efficiently address information leakage via a program execution trace.
-The proofs presented by \citeauthor{mtope} are presented in human-readable format but lack a corresponding proof certificate from verified proof assistant.
+\citeauthor{mtope} presented a type system to efficiently address information leakage by defining a property known as \emph{memory trace oblivious program execution}.
+The proofs presented by \citeauthor{mtope} are rendered in human-readable format but lack verification by a proof assistant such as Coq.
 
 We present the foundation necessary to implement and verify the proofs by \citeauthor{mtope}.
-In section \emph{SECTION LABEL}, we outline our approach.
-In section \emph{SECTION LABEL}, we discuss challenges both technical and not.
-\emph{FLESH THIS PART OUT}
+In section \ref{sec:introduction} we go over some basic concepts from \emph{Memory Trace Oblivious Program Execution}.\cite{mtope}
+Section \ref{sec:requirements} outlines the files included in the software and external requirements needed for the user run the verification.
+In section \ref{sec:discussion}, we discuss the issues and design decisions we made in our implementation.
+
 
 \end{abstract}
 
@@ -80,7 +81,9 @@ In section \emph{SECTION LABEL}, we discuss challenges both technical and not.
 % Summarizing your motivation and your accomplishments.
 
 
-\section {Overview}
+
+\section {Overview Requirements?}
+\label{sec:requirements}
 % The intermediate sections should contain full details about what you did.
 
 We will begin by giving an overview of the Coq project files and the contents within each.
@@ -88,7 +91,8 @@ It will be assumed that the reader is familiar with the definitions and concepts
 Then, we will describe in more detail each file's contents with emphasis on definitions which differ substantially from those provided in the paper.
 
 
-\section{ Project Structure }
+\section{ Implementation Discussion }
+\label{sec:discussion}
 
 % Include a section? Sflib, strong induction technique?
 %	\subsection{ External Requirements }
@@ -254,6 +258,10 @@ Otherwise, if the index is not that related to the last update, the wrapping fun
 Figure \ref{fig:coq_arrays} shows this implementation.
 It should be noted, that part of the assumptions of the paper is that all variables exist in memory and in the typing environment 
 
+
+% TODO : Mention the questions "will this constrain extending the type system to allow each element of an array to occupy its own OramBank"?
+
+
 \begin{figure}
 \caption{ Coq implementation of array get and update}
 \label{fig:coq_arrays}
@@ -282,7 +290,9 @@ Definition mtoarrupd (m:mtoarray) (n1 n2:mtonat) : mtoarray :=
 
 One aspect of implementation in which we initially went in the wrong direction was in our approach to Trace Pattern equivalence.
 Our initial idea was to try to write a function which given two Trace Patterns would return a boolean if the two were equivalent according to the rules shown in figure \ref{fig:mto_TracePat_equiv}.
-However, since Trace Pattern equivalence is a proposition, (Prop type in Coq), we were attempting to produce a function from Prop to boolean, which 
+However, since Trace Pattern equivalence is a proposition, (Prop type in Coq), we were attempting to produce a function from Prop to boolean, which reveals our initial misunderstanding of the Coq Prop type.
+Instead, we arrived at defining trace pattern equivalence as a relation as show in figure \ref{fig:coq_TracePat_equiv}.
+Not only was this more in line with the way Coq should be written, but also this conformed to the pattern in which trace pattern's were used in a relational context, that is in the typing rules for statements.
 
 
 \begin{figure}
@@ -316,9 +326,27 @@ o \sim_L o
 \textbf{Read}\;x \sim_L \textbf{Read}\;x
 \]
 
-
 \end{figure}
 
+
+\begin{figure}
+\caption{ Coq definition of trace pattern equivalence (Only constructors shown) }
+\label{fig:coq_TracePat_equiv}
+
+\begin{lstlisting}
+Inductive TracePatEquiv: TracePat -> TracePat -> Prop:=
+  | Epsilon_equiv: ...
+  | O_equiv : ...
+  | Read_equiv : ...
+  | Fetch_equiv: ...
+  | Assoc_equiv: ...
+  | Trans_equiv: ...
+  | Epsilon_ident_equivl: ...
+  | Epsilon_ident_equivr: ...
+  | Concat_decomp_equiv: ...
+\end{lstlisting}
+
+\end{figure}
 
 
 
@@ -335,15 +363,18 @@ o \sim_L o
 
 %- Duplication in definitions, lemmas, proofs for traces and trace patterns
 %
-%- Handling of arrays
-%	* Will this constrain extending the type system to allow each element of an array to occupy its own OramBank?
-%
 %- Many variables to keep track of.
 %	* A lot of quantified variables in the statement of the theorem
+
+%- The choice to index arrays at 1 has caused some added complexity
+%	* In proofs, destruct nat, 0 case is easy.
+%		In > 0 case. Destruct again for 1 case and > 2
+%	* Made ithelement : (Lemma 2) more difficult
 
 \section{Related Work}
 \label{sec:relatedwork}
 % Research papers should also include a related work section.
+
 
 \section{Conclusion}
 \label{sec:conclusion}
