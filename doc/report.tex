@@ -92,13 +92,14 @@ We will begin by giving an overview of the Coq project files and the contents wi
 The proof package we have put tougher contains the following files listed in order such that items later in the list may require earlier ones, but not vice versa.
 
 \begin{enumerate}
+\item mto_artith.v : Simple (Admitted lemmas from Coq.Arith.Max) \footnote{These lemmas are proven in the standard library but we had technical difficulties including them in our project.}
 \item Sflib.v : Library provided by \emph{Software Foundations}. \cite{sf}
 \item tactic\_notations.v : Proof development helpers for handling inductive cases. (Technique from \emph{Software Foundations})\cite{sf}
 \item strong\_induction.v : Lemmas to allow using strong induction techniques in proving main theorem \cite{strongind}
 \item core.v : Common definitions for downstream dependencies
 \item typing.v : Type judgements and auxiliary typing constructs
 \item semantics.v : Operational semantics and auxiliary semantic constructs
-\item lemmas.v : Statement and 
+\item lemmas.v : Statement and proofs of 
 \item lemmas\_tracepatterns.v
 \item theorem.v : Statement and proof of the main MTOPE theorem.
 \item makefile : Coq generated makefile to build project
