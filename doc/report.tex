@@ -146,20 +146,55 @@ with program : Type :=
 
 
 
-
-
 Figure \ref{fig:while_judgement} shows the typing rule for a \texttt{while} statement.
-Notice that even though figure \ref{fig:mto_statements} shows the definition of a while statement to be without a location, ie. \texttt{while(e,S)}, the typing judgement for statements types a while statement augmented with a location \texttt{p:while(e,S)}, which is structurally a "Program".
+Notice that even though figure \ref{fig:mto_rule_while} shows the definition of a while statement to be without a location, ie. \texttt{while(e,S)}, the typing judgement for statements types a while statement augmented with a location \texttt{p:while(e,S)}, which is structurally a "Program".
 The typing rule requires this information since the type of trace pattern produced depends on a while statements label.
 For this reason, we define \texttt{statement} in Coq to be analogous to the paper's definition, but we introduce a labeled statement.
 Doing this further requires writing the typing rules in terms of labeled statements, rather than plain statements as is done by the paper.
 
+Another deviation from the paper's definitions is in the implementation of the operator $\sqsubseteq$.
+In all but one case, this operator compares two security labels, each of which can be either $L$ or an Oram Bank number - definition shown in figure \ref{fig:mto_labeldef}.
+However, in the typing rule for, what the paper refers to as, a labeled statement one of the premises abuses the $\sqsubseteq$ operator by comparing a label, $l_{0}$ to a location. The rule is shown in figure \ref{fig:mto_rule_statement}
 
-%	\begin{lstlistings}
-%
-%	\end{lstlistings}
+\begin{figure}
+\caption{Formal definition for Labels}
+\label{fig:mto_labeldef}
+	\begin{mdframed}
+	Labels $l \in \textbf{SecLabels} = \{L\} \cup \textbf{ORAMbanks}$
+	\end{mdframed}
+\end{figure}
 
-	\subsubsection { Challenges }
+\begin{figure}
+\caption{ Typing rule for labeled statements under the judgment for Programs}
+\label{fig:mto_rule_statement}
+\[
+\frac{ \Gamma, l_{0} \vdash s;T \;\;\; l_{0} \sqsubseteq p }
+	{ \Gamma, l_{0} \vdash p:s;(\textbf{Fetch} p)@T}
+\]
+\end{figure}
+
+\begin{figure}
+\caption{ Coq definition of the $\sqsubseteq$ operator }
+\label{fig:coq_label_le}
+\begin{lstlisting}
+Inductive label_le : label -> label -> Prop :=
+  | fst_low : forall   l, label_le low l
+  | snd_high: forall l n, label_le l   (o_high n).
+
+Inductive label_le_rhslocation : label -> location -> Prop :=
+  | highloc : forall l n, label_le_rhslocation l   (oram n)
+  | lowlab  : forall   p, label_le_rhslocation low p.
+\end{lstlisting}
+
+\end{figure}
+
+Figure \ref{coq_label_le} shows our proposed implementation of this operator.
+We essentially have two versions of the $\sqsubseteq$ relation, one which is the expected operation of comparing two security labels, and the other of which compares a label to a location.
+
+
+
+
+
 
 	\subsection{ Typing Judgements }
 	\subsection{ Operational Semantics }
