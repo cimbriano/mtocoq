@@ -92,14 +92,14 @@ Inductive statementTyping: environment -> label -> labeledstatement -> TracePat 
 with progTyping: environment -> label -> program -> TracePat -> Prop :=
 
 (***
-  for this rule, they require that l0 (elle zero, not ten) 
-  is less/equal p (where 
+  for this rule, they require that l0 (elle zero, not ten)
+  is less/equal p (where
     l0 is a label and
     p is a location,
-  We use a special relation called label_le_rhslocataion for this.
+  We use a special relation called label_le_rhslocation for this.
 ***)
 
-  | TLab : forall gamma l0 s T p,  (statementTyping gamma l0 (labline p s) T) -> (label_le_rhslocataion l0 p) ->
+  | TLab : forall gamma l0 s T p,  (statementTyping gamma l0 (labline p s) T) -> (label_le_rhslocation l0 p) ->
       (progTyping gamma l0 (oneLineProg( labline p s)) (Concat (Fetch p) T))
   | TSeq : forall gamma l0 S1 T1 S2 T2, ((progTyping gamma l0 S1 T1) ->
       (progTyping gamma l0 S2 T2) ->
