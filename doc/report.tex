@@ -2,6 +2,10 @@
 \usepackage{enumerate}
 \usepackage{url}
 
+% To put a border around figures
+\usepackage{ mdframed }
+
+
 % To use inline teletype command \texttt{}
 \usepackage{courier}
 
@@ -99,12 +103,16 @@ Then, we will describe in more detail each file's contents with emphasis on defi
 
 \begin{figure}
 \caption{ MTPOE definitions for Statements and Programs }
-\label{fig:mto_statements}
-Numbers $n \in \textbf{Nat}$\\
-ORAM bank $o \in \textbf{ORAMbank}$\\
-Locations $p ::= n | o$\\
-Statements $ s ::= skip | x := e | x[e] := e | if(e, S, S) | while(e, S)$\\
-Programs $ S ::= p:s | S;S$
+\label{fig:mto_rule_while}
+
+	\begin{mdframed}
+	Numbers $n \in \textbf{Nat}$\\
+	ORAM bank $o \in \textbf{ORAMbank}$\\
+	Locations $p ::= n | o$\\
+	Statements $ s ::= skip | x := e | x[e] := e | if(e, S, S) | while(e, S)$\\
+	Programs $ S ::= p:s | S;S$
+	\end{mdframed}
+
 \end{figure}
 
 \begin{figure}
