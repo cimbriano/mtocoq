@@ -12,13 +12,28 @@ Require Export typing.
 
 Require Export lemmas.
 
-(**
-Lemma labelequal_int : forall M1 M2 x l1 l2 n1 n2, (lowEquivalentMem M1 M2) ->
-(M1 x = Some (vint n1 l1)) -> (M2 x = Some (vint n2 l2)) ->
-(l1 = l2).
+Require Export Arith.
+
+Fixpoint max n m : nat :=
+  match n, m with
+    | O, _ => m
+    | S n', O => n
+    | S n', S m' => S (max n' m')
+  end.
+
+(* these are well known properties of max, they are theorems in the santdard library,
+but were having trouble *)
+Lemma le_max_l : forall n m, n <= max n m.
 Proof.
 Admitted.
-**)
+
+Lemma le_max_r : forall n m, m <= max n m.
+Proof.
+Admitted.
+
+Lemma le_max_or : forall n m, (n = max n m)\/(m = max n m).
+Proof.
+Admitted.
 
 Lemma stayvalid : forall gamma M p t M' , (gammavalid gamma M) -> 
 (progSem M p t M') -> (gammavalid gamma M').
@@ -102,72 +117,6 @@ split;
 reflexivity.
 Qed.
 
-
-
-Lemma sameProg_sameTrace : forall M1 M1' p1 t1 t2,
-(progSem M1 p1 t1 M1') -> (progSem M1 p1 t2 M1') ->
-(t1 = t2).
-Proof.
-intros M1 M1' p1.
-induction p1.
-destruct l.
-induction s.
-intros t1 t2 H1 H2.
-inversion H1.
-inversion H2.
-inversion H6.
-inversion H12.
-reflexivity.
-intros t1 t2 H1 H2.
-inversion H1.
-inversion H2.
-inversion H6.
-inversion H12.
-assert (t3 = t4 /\ n = n0).
-apply sameExpr_sameStuff with M1 e;
-assumption.
-inversion H29.
-rewrite H20 in H28.
-inversion H28.
-rewrite H31.
-rewrite H30.
-reflexivity.
-intros t1 t2 H1 H2.
-inversion H1.
-inversion H2.
-inversion H6.
-inversion H12.
-assert (t3 = t5 /\ n1 = n0).
-apply sameExpr_sameStuff with M1 e;
-assumption.
-assert (t4 = t6 /\ n2 = n3).
-apply sameExpr_sameStuff with M1 e0;
-assumption.
-inversion H35.
-inversion H36.
-rewrite H37.
-rewrite H38.
-rewrite H39.
-rewrite H40.
-rewrite H33 in H22.
-inversion H22.
-reflexivity.
-intros t1 t2 H1 H2.
-inversion H1.
-inversion H2.
-assert (t = t0).
-inversion H6.
-inversion H12.
-assert (t3 = t5 /\ n = n0).
-apply sameExpr_sameStuff with M1 e;
-assumption.
-(*fuck it*)
-Admitted.
-
-
-
-
-
 Lemma lowEquiv_persist : forall M1 M2 x v, (lowEquivalentMem M1 M2) ->
 (lowEquivalentMem (memdefine M1 x v) (memdefine M2 x v)).
 Proof.
@@ -201,7 +150,7 @@ apply iff_sym.
 apply H.
 Qed.
 
-Lemma lowEquiv_persist_high_int : forall M1 x v o,
+Lemma lowEquiv_persist_high_int : forall M1 x v o, 
 (exists v1, M1 x = Some (vint v1 (o_high o))) ->
 (lowEquivalentMem (memdefine M1 x (vint v (o_high o))) M1).
 Proof.
@@ -257,7 +206,7 @@ apply iff_refl.
 Qed.
 
 
-Lemma lowEquiv_persist_high_arr : forall M1 x v o,
+Lemma lowEquiv_persist_high_arr : forall M1 x v o, 
 (exists v1, M1 x = Some (varr v1 (o_high o))) ->
 (lowEquivalentMem (memdefine M1 x (varr v (o_high o))) M1).
 Proof.
@@ -422,8 +371,8 @@ Qed.
 
 
 Lemma whilecase :  forall  n p p0 e t1 t2 M1 M1' M2 M2' l T gamma,
- tracelen_withepsilon t1 = n->
- tracelen_withepsilon t2 = tracelen_withepsilon t1->
+ tracelen_withepsilon t1 <= n->
+ tracelen_withepsilon t2 <= n->
  (lowEquivalentMem M1 M2) ->
  (stmtSem M1 (labline p (stwhile e p0)) t1 M1') -> 
  (stmtSem M2 (labline p (stwhile e p0)) t2 M2') -> 
@@ -438,8 +387,8 @@ Proof.
 intros n.
 apply strongind with 
 (P:=(fun n:nat =>forall p p0 e t1 t2 M1 M1' M2 M2' l T gamma,
- tracelen_withepsilon t1 = n->
- tracelen_withepsilon t2 = tracelen_withepsilon t1->
+ tracelen_withepsilon t1 <= n->
+ tracelen_withepsilon t2 <= n->
  (lowEquivalentMem M1 M2) ->
  (stmtSem M1 (labline p (stwhile e p0)) t1 M1') -> 
  (stmtSem M2 (labline p (stwhile e p0)) t2 M2') -> 
@@ -498,27 +447,58 @@ inversion H23.
 inversion H30.
 
 assert (traceequiv t9 t10 /\ lowEquivalentMem M1' M2').
-apply mm with (tracelen_withepsilon t9) p p0 e M6 M9 l T gamma.
-apply le_S_n.
-rewrite <-HH1.
-rewrite <- H4.
-rewrite <- H21.
+apply mm with (max (tracelen_withepsilon t9) (tracelen_withepsilon t10)) p p0 e M6 M9 l T gamma.
+assert ( (tracelen_withepsilon t9) = 
+max (tracelen_withepsilon t9) (tracelen_withepsilon t10)\/
+(tracelen_withepsilon t10) =
+ max (tracelen_withepsilon t9) (tracelen_withepsilon t10)).
+apply le_max_or.
+inversion H47.
+rewrite <- H48.
+rewrite <- H4 in HH1.
+apply nonzerolength_expr in H3.
+simpl in HH1.
+apply le_S_n in HH1.
+apply le_trans with (tracelen_withepsilon t + tracelen_withepsilon t0).
+destruct (tracelen_withepsilon t).
+assert (0=0).
+reflexivity.
 simpl.
-apply le_n_S.
-rewrite plus_assoc.
+apply H3 in H49.
+inversion H49.
+rewrite <- H21.
 rewrite <- H37.
 simpl.
-apply le_Sn_le.
+rewrite plus_assoc.
+rewrite <- plus_Sn_m.
+rewrite <- plus_n_Sm.
+rewrite <- plus_Sn_m.
 apply le_plus_r.
+assumption.
+rewrite <- H48.
+rewrite <- H13 in HH2.
+apply nonzerolength_expr in H12.
+simpl in HH2.
+apply le_S_n in HH2.
+apply le_trans with (tracelen_withepsilon t3 + tracelen_withepsilon t4).
+destruct (tracelen_withepsilon t3).
+assert (0=0).
 reflexivity.
-assert (tracelen_withepsilon t6 = (tracelen_withepsilon t8)).
+simpl.
+apply H12 in H49.
+inversion H49.
+rewrite <- H28.
+rewrite <- H43.
+simpl.
+rewrite plus_assoc.
+rewrite <- plus_Sn_m.
+rewrite <- plus_n_Sm.
+rewrite <- plus_Sn_m.
+apply le_plus_r.
+assumption.
+apply le_max_l.
+apply le_max_r.
 
-admit.
-rewrite <- H43 in H47.
-rewrite <- H37 in H47.
-simpl in H47.
-inversion H47.
-reflexivity.
 assumption.
 assumption.
 assumption.
@@ -642,14 +622,14 @@ Qed.
 
 
 Theorem Theoremone : forall S (gamma:environment) (l:label) (T:TracePat),
-((progTyping gamma l S T) ->
+((progTyping gamma l S T) -> 
 (memTraceObliv gamma S)).
 Proof.
 intros S.
 remember (num_statements S).
 generalize Heqn.
 generalize S.
-apply strongind with
+apply strongind with 
 (P:=(fun n => forall S, n=num_statements S -> (
 forall gamma l T, progTyping gamma l S T -> memTraceObliv gamma S
 ))).
@@ -695,7 +675,7 @@ apply HH1.
 (*assign case*)
 intros M1 M2 t1 M1' t2 M2'.
 intros HH1 HH2 HH3 HH4 HH5.
-inversion HH1.
+inversion HH1. 
 inversion HH4.
 inversion H8.
 inversion HH5.
@@ -796,7 +776,7 @@ apply H30.
 (*array assign case*)
 intros M1 M2 t1 M1' t2 M2'.
 intros HH1 HH2 HH3 HH4 HH5.
-inversion HH1.
+inversion HH1. 
 inversion HH4.
 inversion H8.
 inversion HH5.
@@ -898,7 +878,14 @@ assert (m1 = m2).
 rewrite H36.
 rewrite H19.
 assert (m = m0).
-admit.
+unfold lowEquivalentMem in HH1.
+inversion HH1.
+assert ((M1 v = Some (varr m low)) <->(M2 v = Some (varr m low))).
+apply H59.
+apply H60 in H18.
+rewrite H18 in H35.
+inversion H35.
+reflexivity.
 rewrite H58.
 reflexivity.
 rewrite H58.
@@ -992,7 +979,7 @@ apply H47 with M1 M2 ;
 assumption.
 inversion H46.
 split.
-inversion H45.
+inversion H45. 
 rewrite H49.
 apply concat_decomp_equiv.
 apply equal_equiv.
@@ -1049,7 +1036,7 @@ apply H47 with M1 M2 ;
 assumption.
 inversion H46.
 split.
-inversion H45.
+inversion H45. 
 rewrite H49.
 apply concat_decomp_equiv.
 apply equal_equiv.
@@ -1219,9 +1206,9 @@ assumption.
 assumption.
 
 assert (traceequiv t t0/\ lowEquivalentMem M1' M2').
-apply whilecase  with (tracelen_withepsilon t) p p0 e M1 M2 low T gamma.
-reflexivity.
-admit.
+apply whilecase  with (max (tracelen_withepsilon t) (tracelen_withepsilon t0)) p p0 e M1 M2 low T gamma.
+apply le_max_l.
+apply le_max_r.
 assumption.
 assumption.
 assumption.
