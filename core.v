@@ -58,4 +58,5 @@ Inductive label_le : label -> label -> Prop :=
 
 (**** we cover that case here****)
 Inductive label_le_rhslocataion : label -> location -> Prop :=
-  | nothighloc : forall l n, label_le_rhslocataion l (oram n).
+  | nothighloc : forall l n, label_le_rhslocataion l (oram n)
+  | lowlab : forall p, label_le_rhslocataion low p.

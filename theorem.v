@@ -879,241 +879,80 @@ inversion H57.
 assumption.
 inversion H57.
 assumption.
+
 (* beginning while case *)
 
-
-
-
-unfold mtojoin in Heql2.
-
-
-assert (t3=t5).
-remember lemmaseven.
-apply e3 with gamma e l T0 M1 M2 t3 t5 n n0 in H5;
-repeat assumption.
-assert (traceequiv t4 t6 /\ lowEquivalentMem M1' M2' ).
-assert (progTyping gamma low p0 T1 -> memTraceObliv gamma p0).
-(*assert (forall gamma l T, progTyping gamma l p0 T -> memTraceObliv gamma p0).*)
-apply mm with (m:= num_statements p0).
-unfold num_statements in DEFLEN.
-inversion DEFLEN.
-apply le_plus_l.
-reflexivity.
-assert (memTraceObliv gamma p0).
-apply H46.
-assumption.
-unfold memTraceObliv in H47.
-apply H47 with M1 M2 ;
-assumption.
-inversion H46.
-split.
-inversion H45. 
-rewrite H49.
-apply concat_decomp_equiv.
-apply equal_equiv.
-apply concat_decomp_equiv.
-apply equal_equiv.
-assumption.
-assumption.
-
-
-assert (t3=t5 /\ n = n0).
-remember lemmasix.
-apply a with gamma e T0 M1 M2 t3 t5 n n0 in H5;
-repeat assumption.
-inversion H45.
-rewrite H47 in *.
-rewrite H43 in H33.
-assert (0=0).
-reflexivity.
-apply H33 in H48.
-inversion H48.
-
-inversion H24.
-
-assert (t3=t5 /\ n = n0).
-remember lemmasix.
-apply a with gamma e T0 M1 M2 t3 t5 n n0 in H5;
-repeat assumption.
-inversion H45.
-rewrite H47 in *.
-rewrite H33 in H43.
-assert (0=0).
-reflexivity.
-apply H43 in H48.
-inversion H48.
-
-
-assert (t3=t5 /\ n = n0).
-remember lemmasix.
-apply a with gamma e T0 M1 M2 t3 t5 n n0 in H5;
-repeat assumption.
-assert (traceequiv t4 t6 /\ lowEquivalentMem M1' M2' ).
-assert (progTyping gamma low p1 T2 -> memTraceObliv gamma p1).
-(*assert (forall gamma l T, progTyping gamma l p0 T -> memTraceObliv gamma p0).*)
-apply mm with (m:= num_statements p1).
-unfold num_statements in DEFLEN.
-inversion DEFLEN.
-apply le_plus_r.
-reflexivity.
-assert (memTraceObliv gamma p1).
-apply H46.
-assumption.
-unfold memTraceObliv in H47.
-apply H47 with M1 M2 ;
-assumption.
-inversion H46.
-split.
-inversion H45. 
-rewrite H49.
-apply concat_decomp_equiv.
-apply equal_equiv.
-apply concat_decomp_equiv.
-apply equal_equiv.
-assumption.
-assumption.
-inversion Heql2.
-
-
-
-
-
-
-
-fail.
-
-
-generalize H33.
-trivial.
-
-apply mm.
-apply sameProg_sameTrace with M1 M1' p0.
-assumption.
-assumption.
-assumption.
-inversion H44.
-
-
-remember lemmatwelve.
+intros M1 M2 t1 M1' t2 M2'.
+intros HH1 HH2 HH3 HH4 HH5.
 inversion HH4.
-inversion H18.
 inversion HH5.
-inversion H34.
-apply a with gamma (o_high o) p0 p1 T1 T2 M1 M2 M1' M2' t3 t6 in H8.
-split.
-apply H8.
-apply H8.
-apply H10.
-apply H11.
-intros HH.
-inversion HH.
-assumption.
-assumption.
-assumption.
-assumption.
-
-remember lemmaseven.
-apply e7 with gamma e l2 T1 M1 M2 t0 t5 n1 n0 in H43.
-inversion H43.
-split.
-symmetry.
-apply H53.
-apply H52.
-assumption.
-assumption.
-assumption.
-assumption.
-
-assert (m1 = m2).
-rewrite H36.
-rewrite H19.
-assert (m = m0).
-admit.
-rewrite H58.
+inversion H.
+assert (l = low).
+destruct l.
 reflexivity.
-rewrite H58.
+destruct l0.
+simpl in H21.
+inversion H21.
+simpl in H21.
+inversion H21.
+assert (l0 = low).
+destruct l0.
+reflexivity.
+destruct l.
+simpl in H21.
+inversion H21.
+simpl in H21.
+inversion H21.
+rewrite H22 in *.
+rewrite H23 in *.
+clear H22 H23 l l0 H17 H21 l.
 
+assert (forall t1 t2 n1 n2, (exprSem M1 e t1 n1)-> (exprSem M2 e t2 n2) -> (t1 = t2 /\ n1 = n2)).
+intros tt1 tt2 nn1 nn2.
 
-
-
-unfold mtoarrupd.
-unfold lowEquivalentMem in HH1.
-inversion HH1.
-apply H59.
-
-split HH1.
-apply HH1.
-
-apply lowEquiv_persist.
-
-
-
-assert (t0 = t5).
-destruct l2.
-
-
-
-apply proj1 in H41.
-apply proj2 
-
-split.
-apply concat_decomp_equiv.
-apply equal_equiv.
-
-
-
-
-assert (gamma v = Some (lnat l)).
-
-apply HH2.
-
-
-destruct l4.
-rewrite H39.
-apply HH2.
-apply HH3.
-apply H14.
-apply H28.
-assert (t1 = t2).
-destruct l4.
-
-
-split.
-remember lemmasix.
-apply a with gamma e  T0 M1 M2 t0 t4 n n0 in H35 .
-inversion H35.
-rewrite H39.
-rewrite H40.
-assert (l=l1).
-apply labelequal_int with M1 M2 v n1 n2.
-apply HH1.
-apply H15.
-apply H29.
-rewrite H41.
-apply equal_equiv.
-apply HH2.
-apply HH3.
-apply H14.
-apply H28.
-apply 
-apply concat_decomp_equiv.
-apply equal_equiv.
-apply concat_decomp_equiv.
-apply equal_equiv.
-
-split.
-apply concat_decomp_equiv.
-apply equal_equiv.
-apply concat_decomp_equiv.
+intros HHH1 HHH2.
+apply lemmasix with gamma e T1 M1 M2 tt1 tt2 nn1 nn2 in H18 .
+apply H18.
+repeat assumption.
+assumption.
+assumption.
 assumption.
 
-simpl.
-intros M1.
-destruct H.
+inversion H6.
+inversion H12.
 admit.
+admit.
+inversion H12.
+admit.
+assert (t3 = t5 /\ n = 0).
+apply lemmasix with gamma e T1 M1 M2' t3 t5 n 0 in H18.
+inversion H18.
+apply H27 in H37.
+inversion H37.
+assumption.
+assumption.
+assumption.
+assumption.
+
+inversion H37.
+inversion H28.
+
+inversion H42.
+rewrite H43 in *.
 
 
-induction l0.
-inversion .
-intros H.
-Admitted.
+
+assert (progTyping gamma low (progcat p0 (oneLineProg (labline p (stwhile e p0))))
+ (Concat T2 (Concat (Fetch p) T))).
+
+apply TSeq.
+assumption.
+apply TLab.
+assumption.
+apply lowlab.
+
+
+assert (memTraceObliv gamma (progcat p0 (oneLineProg (labline p (stwhile e p0))))).
+apply mm with nn.
+
+
