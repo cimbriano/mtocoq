@@ -86,17 +86,17 @@ Then, we will describe in more detail each file's contents with emphasis on defi
 
 % Include a section? Sflib, strong induction technique?
 %	\subsection{ External Requirements }
-	
- 
+
+
 % TODO Maybe these shouldn't be subsections, but some form of list instead?
 	\subsection{ Core Definitions }
 	The foundation of our definitions are found in a file called core.v.
 	Here is where we define all structures common to that will be used in downstream definitions.
 	For the most part the definitions here follow one-to-one from those in the paper, however the definition of statement required special handling.
-	
+
 	Below we reproduce the relevant definitions from the paper and our Coq definitions.
 
-	
+
 \begin{figure}
 \caption{ MTPOE definitions for Statements and Programs }
 \label{fig:mto_statements}
@@ -114,12 +114,12 @@ Programs $ S ::= p:s | S;S$
 \frac{ \Gamma \vdash e : Nat \; l; T_{1}   \;\;\;\;  \Gamma, l_{0} \vdash S;T_{2}  \;\;\;\;   l \sqcup l_{0} \sqsubseteq L }
 	{ \Gamma, l_{0} \vdash p:\textbf{while}(e,S);\textbf{Loop}(p,T_{1},T_{2}) }
 \]
-\end{figure}	
+\end{figure}
 
 \begin{figure}
 \caption{Coq definitions for statements, programs and labeled statements}
 \label{fig:coq_statements}
-\begin{lstlisting}		
+\begin{lstlisting}
 Inductive statement : Type :=
   | skip : statement
   | assign: variable -> expression -> statement
@@ -133,28 +133,30 @@ with labeledstatement : Type :=
 with program : Type :=
   | oneLineProg : labeledstatement -> program
   | progcat : program -> program -> program.
-\end{lstlisting}	
+\end{lstlisting}
 \end{figure}
 
 
 
-	
+
 
 Figure \ref{fig:while_judgement} shows the typing rule for a \texttt{while} statement.
 Notice that even though figure \ref{fig:mto_statements} shows the definition of a while statement to be without a location, ie. \texttt{while(e,S)}, the typing judgement for statements types a while statement augmented with a location \texttt{p:while(e,S)}, which is structurally a "Program".
+The typing rule requires this information since the type of trace pattern produced depends on a while statements label.
 For this reason, we define \texttt{statement} in Coq to be analogous to the paper's definition, but we introduce a labeled statement.
-\texttt{Program}s is Coq then are not composed of statements, but instead of \texttt{labeledStatements}.
-	
+Doing this further requires writing the typing rules in terms of labeled statements, rather than plain statements as is done by the paper.
+
+
 %	\begin{lstlistings}
-%		
+%
 %	\end{lstlistings}
 
 	\subsubsection { Challenges }
-	
+
 	\subsection{ Typing Judgements }
 	\subsection{ Operational Semantics }
 	\subsection{ Lemmas and Proofs }
-	
+
 
 \section{  }
 
@@ -175,7 +177,7 @@ Inductive expression : Type :=
 % Proofs were written by humans for humans.
 % Many times there we're "abuses of notation", "lemma 5 is proved using a similar technique as lemma 4"
 	% which resulted in requiring more infrastructure/definitions than we initially envisioned
-	
+
 
 %- Duplication in definitions, lemmas, proofs for traces and trace patterns
 %
@@ -189,7 +191,7 @@ Inductive expression : Type :=
 
 \section{Related Work}
 \label{sec:relatedwork}
-% Research papers should also include a related work section. 
+% Research papers should also include a related work section.
 
 \section{Conclusion}
 \label{sec:conclusion}

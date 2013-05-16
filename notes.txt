@@ -25,7 +25,11 @@ Reflections / ToDo
 
 - Tactic Notation for statements, programs, other inductively defined things
 
-
+- Unify variable names
+	* Sometimes i is used for nats, sometimes n. Prefer n.
+	* TracePat, tp, tracepat_len, ithelement_tp.
+	* Use of _ underscore in lemma names.
+	* Capitalization when using TracePat things.
 
 Other Things
 

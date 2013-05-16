@@ -153,7 +153,7 @@ inversion H12.
 assert (t3 = t5 /\ n = n0).
 apply sameExpr_sameStuff with M1 e;
 assumption.
-(*fuck it*)
+(* gave up for now *)
 Admitted.
 
 
