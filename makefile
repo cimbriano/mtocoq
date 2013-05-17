@@ -91,8 +91,7 @@ VFILES:=Sflib.v\
   tactic_notations.v\
   theorem.v\
   typing.v\
-  unproven_lemmas.v\
-  unused_definitions.v
+  unproven_lemmas.v
 
 -include $(addsuffix .d,$(VFILES))
 .SECONDARY: $(addsuffix .d,$(VFILES))
