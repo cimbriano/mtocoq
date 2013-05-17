@@ -233,8 +233,8 @@ We'll omit discussion of the mostly straightforward parts of these two sections 
 
 % Naming convention - labeled types and labeled values
 The basic types for values in this type system are $Nat$ and $Array$.
-However, since the goal of this work is to maintain the security of sensitive data, the values types are augmented with security labels as discussed in the previous section.
-The paper uses the term Types to refer to one of $Nat$ or $Array$ augmented with a security label, whereas our implementation uses the terms \texttt{labeledType} and \texttt{labeledValue} as shown in figure \ref{fig:coq_labeled_things}.
+However, since the goal of this work is to maintain the security of sensitive data, the values' types are augmented with security labels as discussed in the previous section.
+The paper uses the term "Type" to refer to one of $Nat$ or $Array$ augmented with a security label, whereas our implementation uses the terms \texttt{labeledType} and \texttt{labeledValue} as shown in figure \ref{fig:coq_labeled_things}.
 
 \begin{figure}
 \caption{Plain basic type sand augmented with security labels}
@@ -257,11 +257,11 @@ Inductive labeledType : Type :=
 
 
 % Memory and Gamma are total functions
-Both the typing definitions and semantics definitions require a mapping from variables to some value.
-In typing this map is called $\Gamma$, or the typing environment,  which maps variables to types.
-In semantics this is a representation of memory, $M$, which maps variables to values which can have type $Array \; l$ or $Nat \; l$, where $l$ is a security label.
+Both the typing definitions and semantics definitions require mappings from variables to some value.
+For typing this map is called $\Gamma$, a the typing environment,  which maps variables to types.
+In semantics this is called $M$, a memory, which maps variables to values which can have type $Array \; l$ or $Nat \; l$, where $l$ is a security label.
 In the paper, these maps are treated as partial-functions that are defined for some finite domain and undefined all inputs outside that domain.
-In Coq however, we're forced to define total functions and we do so by returning an option type as shown in figure \ref{fig:coq_total_functions}.
+In Coq, we're forced to define total functions and we do so by returning an option type as shown in figure \ref{fig:coq_total_functions}.
 
 
 \begin{figure}
@@ -277,15 +277,15 @@ Definition      memory : Type := variable -> (option labeledValue).
 
 % Judgement call - Mutable arrays as functions that get updated
 The semantic rules for array assignment necessitate the modeling of mutable arrays.
-Since Coq is a functional language, our arrays are implemented as functions which take an index and return a value - either the value at the index if it is in bounds, or zero if the index is out of bounds.
+Our arrays are implemented as functions which take an index and return a value - either the value at the index if it is in bounds, or zero if the index is out of bounds.
 In order to support mutability, updates to an array are implemented as a wrapping function around an existing array.
 When the array, or equivalently the wrapping function, is applied to an index, if that index matches that given to the wrapping function as part of the update, then the application is "caught" at the wrapping function and a value is returned immediately.
 Otherwise, if the index is not that related to the last update, the wrapping function passes along the index to the last wrapped array.
 Figure \ref{fig:coq_arrays} shows this implementation.
-It should be noted, that part of the assumptions of the paper is that all variables exist in memory and in the typing environment 
+It should be noted, that part of the assumptions of the paper is that all variables that will be used exist in memory and in the typing environment 
 
 
-% TODO : Mention the questions "will this constrain extending the type system to allow each element of an array to occupy its own OramBank"?
+% TODO : Mention the questions "will this constrain extending the type system to allow each element of an array to occupy its own OramBank"? -- DONE IN CONCLUSION 
 
 
 \begin{figure}
@@ -314,11 +314,14 @@ Definition mtoarrupd (m:mtoarray) (n1 n2:mtonat) : mtoarray :=
 
 % Choosing to represent trace equivalence and trace pattern equivalence as Relations instead of functions (because they're only used in a relational way)
 
-One aspect of implementation in which we initially went in the wrong direction was in our approach to Trace Pattern equivalence.
+One aspect of implementation in which we initially went in the wrong direction was in Trace Pattern equivalence.
 Our initial idea was to try to write a function which given two Trace Patterns would return a boolean if the two were equivalent according to the rules shown in figure \ref{fig:mto_TracePat_equiv}.
-However, since Trace Pattern equivalence is a proposition, (Prop type in Coq), we were attempting to produce a function from Prop to boolean, which reveals our initial misunderstanding of the Coq Prop type.
-Instead, we arrived at defining trace pattern equivalence as a relation as show in figure \ref{fig:coq_TracePat_equiv}.
-Not only was this more in line with the way Coq should be written, but also this conformed to the pattern in which trace pattern's were used in a relational context, that is in the typing rules for statements.
+The rules for Trace Pattern equivalence do not suggest how to acutally check for Trace Pattern equivalence. 
+In particular, transitivity and associativity of concat are difficult to know when to use.
+We spent some time trying to come up with a way of computing Trace Pattern equivalence.
+Instead, we arrived at defining trace pattern equivalence as a relation as shown in figure \ref{fig:coq_TracePat_equiv}.
+Not only was this more in line with the way Coq should be written, but also this conformed to the way in which Trace Patterns were used in a relational context.
+That is, in the typing rules for statements.
 
 
 \begin{figure}
@@ -395,10 +398,9 @@ This meant we had to special case out both 0 and 1.
 
 When proving theorem one, we found a strong induction prinicple that we included. \cite{strongind}
 This was used twice in our proof. 
-First, when considering the case in which the program is a single if statement, we performed strong induction on the number of statements in the program. 
-In the case of a single while loop, the technical report makes use of induction over the number of times a while loop is executed. 
-This was difficult to formalize in Coq, so we decided to do strong induction on the length of the trace from executing the while loop. 
-In hind sight, we could of replace these two with a single induction on the length of the trace, instead of worrying about the number of statements in the program.
+First, when considering the case in which the program is an if statement, we performed strong induction on the number of statements in the program. 
+In the case of a while loop, the technical report makes use of induction over the number of times a while loop is executed. 
+This was difficult to formalize in Coq, so we decided to do induction on the length of the trace from executing the while loop. 
 After we condier each single line program, we do structural induction on program concatenation.
 
 In proving the theorem, it took some effort to convice Coq of things that seemed basic.  For example, convincing it that changing a high security variable maintains low memory equvalence.
@@ -439,12 +441,12 @@ Similarly basic, proving that assigning the same value to the same variable main
 
 We have been able to find several typos in the paper, though we still have not managed to fully verify it. 
 Though the theorem of the paper has been verified, the supporting lemmas used have not yet all been verified. 
-This is a very natural spot for future work, completing the verification of the lemmas used. 
+This is a clear opportunity for future work, completing the verification of the lemmas used. 
 We have only admitted a single lemma in addition to those presented in the technical report. 
 % FIGURE OF UNPROVED LEMMA 
 It states that running a program on an initially $\Gamma-$ valid memory will result in a  $\Gamma-$ valid memory.%REF FOR LEMMA
 
-One possible extension of memory trace obliviousness is allowing different elements of an array to occupy their own oram banks. 
+One possible extension of memory trace obliviousness is to allow different elements of an array to have different security labels. 
 This would require entirely redefining how we represent arrays and labeled values, likely meaning much of our Coq code be rewritten.
 
 
