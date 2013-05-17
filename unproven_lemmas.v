@@ -1,120 +1,62 @@
-Require Export Sflib.
 Require Export strong_induction.
-Require Export FSets.
-Require Export Peano.
-Require Export core.
+Require Export mto_paper_definitions.
 Require Export semantics.
 Require Export typing.
-Require Export tactic_notations.
 
+(* Lemmas From the Paper *)
 
-Fixpoint tracepat_len (tp : TracePat) : nat :=
-  match tp with
-  | Epsilon => 0
-  | Concat tp1 tp2 => plus (tracepat_len tp1) (tracepat_len tp2)
-  | _ => 1
-  end.
-
-Fixpoint ithelement_tp (tp:TracePat) (i:nat) : TracePat:=
-  match i with
-  | O   => Epsilon
-  | S O =>
-      match tp with
-      | Concat tp1 tp2 =>
-         match tp1 with
-         | Epsilon => ithelement_tp tp2 i
-         | _ => ithelement_tp tp1 i
-         end
-      | Epsilon        => Epsilon
-      |              _ => tp
-      end
-  | S (S n) =>
-      match tp with
-      | Concat tp1 tp2 => Epsilon
-      | _ => Epsilon
-      end
-  end.
-
-
-Lemma lemma_one_tracepat : forall (T1 T2:TracePat),
-  TracePatEquiv T1 T2 -> (tracepat_len T1) = (tracepat_len T2).
+Lemma lemmatwelve :
+	forall gamma l0 S1 S2 T1 T2 M1 M2 M1' M2' t1 t2,
+	(progTyping gamma l0 S1 T1) ->
+	(progTyping gamma l0 S2 T2) ->
+	(TracePatEquiv T1 T2) ->
+	(gammavalid gamma M1) ->
+	(gammavalid gamma M2) ->
+	(progSem M1 S1 t1 M1') ->
+	(progSem M2 S2 t2 M2') ->
+		((traceequiv t1 t2) /\ (lowEquivalentMem M1' M2')).
 Proof.
-  intros.
+Admitted.
 
-  trace_pattern_equiv_cases (induction H) Case;
-  try (reflexivity).
-
-  Case "Assoc_equiv".
-  simpl. rewrite plus_assoc. reflexivity.
-
-  Case "Trans_equiv".
-    rewrite <- IHTracePatEquiv2. apply IHTracePatEquiv1.
-
-  Case "Epsilon_ident_equivr".
-    simpl. rewrite plus_0_r. reflexivity.
-
-  Case "Concat_decomp_equiv".
-    simpl.
-    rewrite IHTracePatEquiv1.
-    rewrite IHTracePatEquiv2.
-    reflexivity.
-Qed.
-
-
-Lemma lemma_two_1_tracepat : forall (T:TracePat) (i:nat),
-  ((tracepat_len T) = 0) -> (ithelement_tp T i = Epsilon).
+Lemma lemmasix :
+	forall gamma e T M1 M2 t1 t2 n1 n2,
+	(exprTyping gamma e (lnat low) T) ->
+	(gammavalid gamma M1) ->
+	(gammavalid gamma M2) ->
+	(exprSem M1 e t1 n1) ->
+	(exprSem M2 e t2 n2) -> ((t1 = t2) /\ (n1 = n2)).
 Proof.
-  intros.
+Admitted.
 
-  trace_pattern_cases (induction T) Case;
-  try (inversion H).
-
-  Case "Concat".
-    destruct i.
-    SCase "i = 0". reflexivity.
-
-    SCase "i > 0".
-      destruct i.
-
-      SSCase "i = 1".
-
-        trace_pattern_cases (destruct T1) SSSCase;
-        try (intuition).
-
-        SSSCase "Concat". intuition.
-  Case "Epsilon".
-    destruct i.
-    SCase "i = 0". reflexivity.
-    SCase "i > 0".
-      destruct i.
-      SSCase "i = 1". reflexivity.
-      SSCase "i > 1". reflexivity.
-Qed.
-
-
-Lemma lemma_two_2_tracepat : forall (T:TracePat),
-  ithelement_tp T 0 = Epsilon.
+Lemma lemmaseven :
+	forall gamma e l T M1 M2 t1 t2 n1 n2,
+	(exprTyping gamma e (lnat (o_high l)) T) ->
+	(gammavalid gamma M1) ->
+	(gammavalid gamma M2) ->
+	(exprSem M1 e t1 n1) ->
+	(exprSem M2 e t2 n2) -> (t1 = t2).
 Proof.
-  intros T.
-  trace_pattern_cases (induction T) Case;
-  try (simpl; reflexivity).
-Qed.
+Admitted.
 
-Lemma lemma_two_3_tracepat : forall (T:TracePat) (n:nat),
-  (tracepat_len T = S (S n)) ->
-  (exists T1, exists T2, T = Concat T1 T2).
+
+(* Auxiliary Lemma *)
+
+Lemma stayvalid :
+	forall gamma M p t M',
+	(gammavalid gamma M) ->
+	(progSem M p t M') -> (gammavalid gamma M').
 Proof.
-  intros T n.
-  unfold tracepat_len.
+Admitted.
 
-  trace_pattern_cases (destruct T) Case;
-  try (intros H; inversion H).
 
-  Case "Concat".
-    exists T1.
-    exists T2.
-    reflexivity.
-Qed.
+
+(*
+	From TracePattern analogs to trace lemmas
+	included here because the proof is not complete
+
+
+  It is commented instead of Admitted
+  since it wasn't used in proving Theorem 1.
 
 Lemma lemma_two_tracepat : forall (i:nat) (T:TracePat),
   (ithelement_tp T i <> Epsilon) <-> ((le 1 i) /\ (le i (tracepat_len T))).
@@ -159,7 +101,7 @@ Proof.
 Admitted.
 
 (* Copied over trace lemma_two stuff *)
-(*
+
   Case "<-".
   intros n0.
   intros Hyp.
@@ -299,14 +241,4 @@ inversion HHHH.
 apply H1.
 symmetry.
 apply H.
-*)
-
-
-(* End Trace lemma two stuff *)
-(*
-
-Lemma lemma_five : forall (tp1 tp2 : TracePat),
-  TracePatEquiv tp1 tp2 <->
-  forall (i:nat),
-    (ithelement_tp tp1 i) = (ithelement_tp tp2 i).
 *)
