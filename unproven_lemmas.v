@@ -42,7 +42,8 @@ Admitted.
 (* Auxiliary Lemma *)
 
 Lemma stayvalid :
-	forall gamma M p t M',
+  forall (gamma:environment) (M M':memory)
+         (p:program) (t:trace),
 	(gammavalid gamma M) ->
 	(progSem M p t M') -> (gammavalid gamma M').
 Proof.
