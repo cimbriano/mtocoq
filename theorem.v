@@ -1,13 +1,6 @@
-Require Export Sflib.
-Require Export FSets.
-Require Export Peano.
-Require Export core.
-Require Export semantics.
-Require Export typing.
+Require Export strong_induction.
 Require Export lemmas.
-Require Export mto_arith.
 Require Export low_equivalence_properties.
-
 
 Theorem Theoremone :
 	forall S (gamma:environment) (l:label) (T:TracePat),

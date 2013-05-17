@@ -1,16 +1,7 @@
-Require Export Sflib.
-Require Export FSets.
-Require Export Peano.
-Require Export core.
-Require Export semantics.
-Require Export typing.
-Require Export Decidable.
 Require Export tactic_notations.
-Require Export strong_induction.
-Require Export mto_paper_definitions.
 Require Export unproven_lemmas.
 Require Export mto_arith.
-
+Require Export low_equivalence_properties.
 
 Lemma lemmaone :
   forall t1 t2,

@@ -1,6 +1,3 @@
-Require Export Sflib.
-Require Export FSets.
-Require Export Peano.
 Require Export core.
 
 Inductive labeledType : Type :=
