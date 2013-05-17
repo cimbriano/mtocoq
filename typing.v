@@ -21,6 +21,33 @@ Inductive TracePat : Type :=
   | TracePplus : TracePat -> TracePat -> TracePat
   | Epsilon    : TracePat.
 
+Fixpoint tracepat_len (tp : TracePat) : nat :=
+  match tp with
+  | Epsilon => 0
+  | Concat tp1 tp2 => plus (tracepat_len tp1) (tracepat_len tp2)
+  | _ => 1
+  end.
+
+Fixpoint ithelement_tp (tp:TracePat) (i:nat) : TracePat:=
+  match i with
+  | O   => Epsilon
+  | S O =>
+      match tp with
+      | Concat tp1 tp2 =>
+         match tp1 with
+         | Epsilon => ithelement_tp tp2 i
+         | _ => ithelement_tp tp1 i
+         end
+      | Epsilon        => Epsilon
+      |              _ => tp
+      end
+  | S (S n) =>
+      match tp with
+      | Concat tp1 tp2 => Epsilon
+      | _ => Epsilon
+      end
+  end.
+
 Inductive TracePatEquiv: TracePat -> TracePat -> Prop:=
   | Epsilon_equiv: TracePatEquiv Epsilon Epsilon
   | O_equiv : forall n, TracePatEquiv (Orambank n) (Orambank n)
