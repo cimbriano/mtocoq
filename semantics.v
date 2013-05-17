@@ -1,6 +1,3 @@
-Require Export Sflib.
-Require Export FSets.
-Require Export Peano.
 Require Export core.
 
 
@@ -34,10 +31,6 @@ Inductive labeledValue : Type :=
   | vint : mtonat -> label -> labeledValue
   | varr : mtoarray -> label -> labeledValue.
 
-
-
-Definition memory : Type := variable -> (option labeledValue).
-
 Inductive trace : Type :=
   | read : variable -> mtonat -> trace
   | readarr : variable ->mtonat -> mtonat -> trace
@@ -54,6 +47,67 @@ Definition evttrace l t : trace:=
   | low      => t
   | o_high a => orambank a
   end.
+
+Fixpoint tracelen (t:trace) : nat :=
+  match t with
+  | epsilon => 0
+  | concat t1 t2 => plus (tracelen t1) (tracelen t2)
+  | _ => 1
+  end.
+
+(*
+  Used in proving Theorem 1
+  for the induction on while
+*)
+
+Fixpoint tracelen_withepsilon (t:trace) : nat :=
+  match t with
+  | concat t1 t2 => plus (tracelen_withepsilon t1) (tracelen_withepsilon t2)
+  | _ => 1
+  end.
+
+Fixpoint ithelement (t:trace) (i:nat) : trace :=
+  match i with
+  | O => epsilon
+  | S O =>
+
+    match t with
+    | read _ _ => t
+    | write _ _ => t
+    | readarr _ _ _ => t
+    | writearr _ _ _ => t
+    | fetch _ => t
+    | orambank _ => t
+    | concat t1 t2 => (if( ble_nat 1 (tracelen t1) ) then
+                      ithelement t1 i else
+                      ithelement t2 i)
+    |_ => epsilon
+    end
+
+  | S (S n) =>
+    match t with
+    | concat t1 t2 =>
+      if (ble_nat i (tracelen t1))
+      then (ithelement t1 i)
+      else (ithelement t2 (minus i (tracelen t1)))
+    | _ => epsilon
+    end
+  end.
+
+Fixpoint numconcat t : nat :=
+  match t with
+  | concat a b => S (plus (numconcat a) (numconcat b))
+  | _ => O
+  end.
+
+Fixpoint numblocks t : nat :=
+match t with
+| concat a b => numblocks a + numblocks b
+| _ => 1
+end.
+
+
+Definition memory : Type := variable -> (option labeledValue).
 
 Definition memdefine m x v : memory :=
   (
@@ -132,9 +186,7 @@ with progSem : memory -> program -> trace -> memory -> Prop :=
       (progSem M1 S2 t2 M2) ->
       (progSem M (progcat S1 S2) (concat t1 t2) M2).
 
-Definition lowEquivalentMem (M1 M2: memory):  Prop :=
- (forall x v, (M1 x = Some (vint v low)) <-> (M2 x = Some (vint v low))) /\
- (forall x v, (M1 x = Some (varr v low)) <-> (M2 x = Some (varr v low))).
+
 
 Inductive traceequiv: trace -> trace -> Prop:=
   | equal_equiv: forall t, traceequiv t t
@@ -160,6 +212,17 @@ Inductive traceequiv: trace -> trace -> Prop:=
       (traceequiv T11 T12) ->
       (traceequiv T21 T22) ->
       (traceequiv (concat T11 T21) (concat T12 T22)).
+
+Fixpoint num_statements (S:program) : nat :=
+  match S with
+  | (oneLineProg (labline _ (stif _ S1 S2))) =>
+      1 + (num_statements S1) + (num_statements S2)
+  | (oneLineProg (labline _ (stwhile _ S1 ))) =>
+      1 + (num_statements S1)
+  | (oneLineProg _ ) => 1
+  | (progcat S1 S2) => (num_statements S1) + (num_statements S2)
+  end.
+
 
 (***
 Check (stmtSem (memdefine (fun x => None) (var (Id (S O))) (vint O low))

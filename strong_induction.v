@@ -39,6 +39,13 @@ Proof.
   apply le_n.
 Qed.
 
+
+(*
+  Original technique used a parameter, but we used forall
+  sicne we didn't relaly know how parameters work in Coq
+  Parameter P : nat -> Prop.
+*)
+
 Theorem strongind : forall (P : nat -> Prop),
   P 0 ->
   (forall n, (forall m, m <= n -> P m) -> P (S n)) ->
