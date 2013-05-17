@@ -330,15 +330,29 @@ o \sim_L o
 
 \subsection{ Lemmas and Proofs }
 
-When proving theorem one, we found a stond induction prinicple that we included. \cite{strongind}
+Working with the definition of  the $i^{th}$ element of a trace and trace pattern was made more difficult by the indexing beginning at 0.
+This meant we had to special case out both 0 and 1. 
+
+
+
+
+
+
+
+When proving theorem one, we found a strong induction prinicple that we included. \cite{strongind}
 This was used twice in our proof. 
 First, when considering the case in which the program is a single if statement, we performed strong induction on the number of statements in the program. 
 In the case of a single while loop, the technical report makes use of induction over the number of times a while loop is executed. 
 This was difficult to formalize in Coq, so we decided to do strong induction on the length of the trace from executing the while loop. 
-In hind sight, we could of replace these two a single induction on the length of the trace, instead of worrying about the number of statements in the program.
+In hind sight, we could of replace these two with a single induction on the length of the trace, instead of worrying about the number of statements in the program.
 After we condier each single line program, we do structural induction on program concatenation.
 
-In proving the theorem, it took some effort to convice Coq of things that seemed basic.  For example, convincing it that changing a high security variable maintains low memory equvalence, or
+In proving the theorem, it took some effort to convice Coq of things that seemed basic.  For example, convincing it that changing a high security variable maintains low memory equvalence.
+Similarly basic, proving that assigning the same value to the same variable maintains low memory equivalence.
+
+
+
+
 
 
 
@@ -365,6 +379,20 @@ In proving the theorem, it took some effort to convice Coq of things that seemed
 \section{Conclusion}
 \label{sec:conclusion}
 % End with a conclusion putting the project in perspective and mentioning open problems
+
+We have been able to find several typos in the paper, though we still have not managed to fully verify it. 
+Though the theorem of the paper has been verified, the supporting lemmas used have not yet all been verified. 
+This is a very natural spot for future work, completing the verification of the lemmas used. 
+We have only admitted a single lemma in addition to those presented in the technical report. 
+% FIGURE OF UNPROVED LEMMA 
+It states that running a program on an initially $\Gamma-$ valid memory will result in a  $\Gamma-$ valid memory.%REF FOR LEMMA
+
+One possible extension of memory trace obliviousness is allowing different elements of an array to occupy their own oram banks. 
+This would require entirely redefining how we represent arrays and labeled values, likely require much of the Coq code be rewritten.
+
+
+
+
 
 
 %Issues/Difficulties/Notes
