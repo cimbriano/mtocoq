@@ -92,25 +92,27 @@ We will begin by giving an overview of the Coq project files and the contents wi
 The proof package we have put tougher contains the following files listed in order such that items later in the list may require earlier ones, but not vice versa.
 
 \begin{enumerate}
-\item mto\_artith.v : Simple (Admitted lemmas from Coq.Arith.Max)
-% TODO  - Footnote causes mdframed to shit the bed.
-%\footnote{These lemmas are proven in the standard library but we had technical difficulties including them in our project.}
+
 \item Sflib.v : Library provided by \emph{Software Foundations}. \cite{sf}
+\item core.v : Common definitions for downstream dependencies
 \item tactic\_notations.v : Proof development helpers for handling inductive cases. (Technique from \emph{Software Foundations})\cite{sf}
 \item strong\_induction.v : Lemmas to allow using strong induction techniques in proving main theorem \cite{strongind}
-\item core.v : Common definitions for downstream dependencies
-\item typing.v : Type judgements and auxiliary typing constructs
 \item semantics.v : Operational semantics and auxiliary semantic constructs
-\item lemmas.v : Statement and proofs of 
-\item lemmas\_tracepatterns.v
-\item theorem.v : Statement and proof of the main MTOPE theorem.
+\item typing.v : Type judgements and auxiliary typing constructs
+\item mto\_paper\_definitions.v : Definitions one, two and three from the paper
+
+\item unproven\_lemmas.v : Lemmas six, seven and twelve from the paper and one auxiliary lemma needed to prove Theorem one
+\item mto\_arith.v : Simple Admitted lemmas from Coq.Arith.Max \footnote{These lemmas are proven in the standard library but we had technical difficulties including them in our project.}
+\item low\_equivalence\_properties : Properties of the low memory equivalence
+\item lemmas.v : Statement and proofs of various lemmas
+\item theorem.v : Statement and proof of the main MTOPE theorem
 \item makefile : Coq generated makefile to build project
 \end{enumerate}
 
 Additionally, our package has a few other Coq standard library dependencies:
 \begin{itemize}
 \item FSets
-\item	Peano
+\item Peano
 \item Decidable
 \end{itemize}
 
@@ -129,8 +131,8 @@ Then, we will describe in more detail each file's contents with emphasis on defi
 % TODO Maybe these shouldn't be subsections, but some form of list instead?
 	\subsection{ Core Definitions }
 	The foundation of our definitions are found in a file called core.v.
-	Here is where we define all structures common to that will be used in downstream definitions.
-	For the most part the definitions here follow one-to-one from those in the paper, however the definition of statement required special handling.
+	Here is where we define all common structures that will be used in downstream definitions.
+	For the most part the definitions here follow one-to-one from those in the paper however, the definition of \texttt{statement} required special handling.
 
 	Below we reproduce the relevant definitions from the paper and our Coq definitions.
 
@@ -138,16 +140,19 @@ Then, we will describe in more detail each file's contents with emphasis on defi
 \begin{figure}
 \caption{ MTPOE definitions for Statements and Programs }
 \label{fig:mto_rule_while}
-
-	\begin{mdframed}
-	Numbers $n \in \textbf{Nat}$\\
-	ORAM bank $o \in \textbf{ORAMbank}$\\
-	Locations $p ::= n | o$\\
-	Statements $ s ::= skip | x := e | x[e] := e | if(e, S, S) | while(e, S)$\\
+%	\begin{mdframed}
+	Numbers $n \in \textbf{Nat}$
+	
+	ORAM bank $o \in \textbf{ORAMbank}$
+	
+	Locations $p ::= n | o$
+	
+	Statements $ s ::= skip | x := e | x[e] := e | if(e, S, S) | while(e, S)$
+	
 	Programs $ S ::= p:s | S;S$
-	\end{mdframed}
-
+%	\end{mdframed}
 \end{figure}
+
 
 \begin{figure}
 \caption{ Typing Judgement for statements : while}
@@ -181,13 +186,13 @@ with program : Type :=
 
 
 Figure \ref{fig:while_judgement} shows the typing rule for a \texttt{while} statement.
-Notice that even though figure \ref{fig:mto_rule_while} shows the definition of a while statement to be without a location, ie. \texttt{while(e,S)}, the typing judgement for statements types a while statement augmented with a location \texttt{p:while(e,S)}, which is structurally a "Program".
-The typing rule requires this information since the type of trace pattern produced depends on a while statements label.
-For this reason, we define \texttt{statement} in Coq to be analogous to the paper's definition, but we introduce a labeled statement.
+Notice that even though figure \ref{fig:mto_rule_while} shows the definition of a \texttt{while} statement to be without a location, ie. \texttt{while(e,S)}, the typing judgement for statements types a \texttt{while} statement augmented with a location \texttt{p:while(e,S)}, which is structurally a "Program".
+The typing rule requires this information since the type of trace pattern produced depends on a \texttt{while} statement's label.
+For this reason, we define \texttt{statement} in Coq to be analogous to the paper's definition, but we introduce a \texttt{labeledStatement}.
 Doing this further requires writing the typing rules in terms of labeled statements, rather than plain statements as is done by the paper.
 
 Another deviation from the paper's definitions is in the implementation of the operator $\sqsubseteq$.
-In all but one case, this operator compares two security labels, each of which can be either $L$ or an Oram Bank number - definition shown in figure \ref{fig:mto_labeldef}.
+In all but one case, this operator compares two security labels, each of which can be either $L$ or an ORAM Bank number - definition shown in figure \ref{fig:mto_labeldef}.
 However, in the typing rule for, what the paper refers to as, a labeled statement one of the premises abuses the $\sqsubseteq$ operator by comparing a label, $l_{0}$ to a location. The rule is shown in figure \ref{fig:mto_rule_statement}
 
 \begin{figure}
@@ -203,7 +208,7 @@ However, in the typing rule for, what the paper refers to as, a labeled statemen
 \label{fig:mto_rule_statement}
 \[
 \frac{ \Gamma, l_{0} \vdash s;T \;\;\; l_{0} \sqsubseteq p }
-	{ \Gamma, l_{0} \vdash p:s;(\textbf{Fetch} p)@T}
+	{ \Gamma, l_{0} \vdash p:s;(\textbf{Fetch } p)@T}
 \]
 \end{figure}
 
@@ -231,7 +236,7 @@ We essentially have two versions of the $\sqsubseteq$ relation, one which is the
 \subsection{ Typing and Semantics }
 
 The definitions and structures required for typing and semantics are located in Coq file named \texttt{typing.v} and \texttt{semantics.v}.
-We'll omit discussion of the mostly straightforward parts of these two sections and focus on clarifying naming conventions and describing implementation difficulties or judgement calls.
+We'll omit discussion of the mostly straightforward parts of these two sections and focus on clarifying naming conventions, describing implementation difficulties, and justifying judgement calls.
 
 % Naming convention - labeled types and labeled values
 The basic types for values in this type system are $Nat$ and $Array$.
